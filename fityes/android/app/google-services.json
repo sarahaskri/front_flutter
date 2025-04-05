@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513753171443",
+    "project_id": "sign-in-with-a7baa",
+    "storage_bucket": "sign-in-with-a7baa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513753171443:android:7eba1c09cabb5b98a13e86",
+        "android_client_info": {
+          "package_name": "com.example.fityes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy2CLNH0zTi7qu3jE8oDv690KHLf9Q-9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
