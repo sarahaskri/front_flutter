@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class ProfilePage extends StatefulWidget {
   final String email; // L'email de l'utilisateur
   const ProfilePage({super.key, required this.email});
-
+  
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
