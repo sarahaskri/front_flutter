@@ -45,8 +45,9 @@ dependencies:
   form_field_validator: ^1.1.0
   shared_preferences: ^2.5.3
   fl_chart: ^0.70.2
-
-
+  readmore: ^2.2.0
+  dotted_dashed_line: ^0.0.3
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter

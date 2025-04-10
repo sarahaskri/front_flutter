@@ -110,4 +110,28 @@ class ApiService {
       throw Exception("Échec de la connexion Google: ${response.body}");
     }
   }
+
+   static Future<bool> addMeal({
+    required String userId,
+    required String mealType,
+    required String mealName,
+    required String date,
+    required String time,
+  }) async {
+    final url = Uri.parse('$baseUrl/api/users/addMeal');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "userId": userId,
+        "mealType": mealType,
+        "mealName": mealName,
+        "date": date,
+        "time": time,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
 }

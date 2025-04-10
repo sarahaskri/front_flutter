@@ -1,6 +1,8 @@
+import 'package:fityes/home.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fityes/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est correct
+import 'package:fityes/breakfast_interface.dart';
 
 class MealPlannerPage extends StatefulWidget {
   const MealPlannerPage({super.key});
@@ -62,10 +64,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
 
               const SizedBox(height: 16),
               // Affichage de la fréquence sélectionnée
-              Text(
-                "Selected Frequency: $selectedFrequency",
-                style: const TextStyle(fontSize: 16),
-              ),
+              //  Text(
+              // "Selected Frequency: $selectedFrequency",
+              //   style: const TextStyle(fontSize: 16),
+              //   ),
               const SizedBox(height: 16),
               // Affichage des statistiques en fonction de la sélection
               _buildStatistics(),
@@ -133,9 +135,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       title: "Breakfast",
                       subtitle: "120+ Foods",
                       imagePath: "assets/images/apple_pie.png",
+                      
                     ),
                     SizedBox(width: 10),
-                    MealCategoryCard(
+                    MealCategoryCardPink(
                       title: "Lunch",
                       subtitle: "130+ Foods",
                       imagePath: "assets/images/lunch.png",
@@ -162,10 +165,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
       return const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Daily Statistics:"),
+          //  Text("Daily Statistics:"),
           // Affiche ici tes statistiques quotidiennes, par exemple :
-          Text("Calories consumed: 1500"),
-          Text("Meals: 3"),
+          //Text("Calories consumed: 1500"),
+          // Text("Meals: 3"),
           // Autres statistiques
         ],
       );
@@ -173,10 +176,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
       return const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Weekly Statistics:"),
+          //  Text("Weekly Statistics:"),
           // Affiche ici tes statistiques hebdomadaires
-          Text("Calories consumed: 10500"),
-          Text("Meals: 21"),
+          // Text("Calories consumed: 10500"),
+          //    Text("Meals: 21"),
           // Autres statistiques
         ],
       );
@@ -184,10 +187,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
       return const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Monthly Statistics:"),
+          //Text("Monthly Statistics:"),
           // Affiche ici tes statistiques mensuelles
-          Text("Calories consumed: 45000"),
-          Text("Meals: 90"),
+          //Text("Calories consumed: 45000"),
+          // Text("Meals: 90"),
           // Autres statistiques
         ],
       );
@@ -317,7 +320,136 @@ class MealCategoryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(60),
             ),
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                // Navigation vers la page correspondante selon le mealType
+                if (title == "Breakfast") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  BreakfastPage()),
+                  );
+                } else if (title == "Lunch") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                } else if (title == "Dinner") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                }
+              },
+              child: const Text(
+                "Select",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+///cardmodel2
+class MealCategoryCardPink extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String imagePath;
+
+  const MealCategoryCardPink({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.imagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 160,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+           colors: [Color(0xFFFDDDE6), Color(0xFFD8B5FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            // ignore: deprecated_member_use
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            imagePath,
+            height: 80,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title, // Correction ici
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          Text(
+            subtitle, // Correction ici
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 250, 156, 183),
+                  Color(0xFFD8B5FF)
+                ], // 🎨 Dégradé rose à violet clair
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  // ignore: deprecated_member_use
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextButton(
+              onPressed: () {
+                
+          
+                if (title == "Breakfast") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  BreakfastPage()),
+                  );
+                } else if (title == "Lunch") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                } else if (title == "Dinner") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                }
+              },
               child: const Text(
                 "Select",
                 style: TextStyle(color: Colors.white),

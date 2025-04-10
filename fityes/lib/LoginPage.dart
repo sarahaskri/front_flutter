@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final url = Uri.parse('http://192.168.1.13:5003/api/users/login');
+      final url = Uri.parse('http://192.168.43.151:5003/api/users/login');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},

@@ -9,6 +9,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fityes/api_config.dart'; 
 
 late TextEditingController _firstnameController;
 late TextEditingController _lastnameController;
@@ -55,11 +56,11 @@ class _RegisterPageState extends State<RegisterPage> {
       "email": _emailController.text,
       "password": _passwordController.text
     };
-
-    const String baseUrl = 'http://192.168.1.13:5003/api/users/register';
+     final baseUrl = ApiConfig.register(); 
+   
     try {
       final response = await http.post(
-        Uri.parse(baseUrl),
+        baseUrl,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(userData),
       );
@@ -282,7 +283,7 @@ class AuthService {
   Future<UserCredential?> loginWithGoogle() async {
     try {
       // Déconnexion de Google pour éviter les anciennes sessions
-      await GoogleSignIn().disconnect();
+      await GoogleSignIn().signOut();
 
       // Tentative de connexion avec Google
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -313,12 +314,12 @@ class AuthService {
         final lastName = nameParts.length > 1 ? nameParts[1] : "";
 
         // URL de l'API
-        const String baseUrl =
-            'http://192.168.1.13:5003/api/users/GoogleSignIn';
+         final baseUrl = ApiConfig.GoogleSignIn(); 
+      
 
         // Envoi des données utilisateur au backend
         final response = await http.post(
-          Uri.parse(baseUrl), // Utilisation de Uri.parse pour générer l'URL
+          baseUrl, // Utilisation directe de la chaîne de caractères pour l'URL
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({
             "uid": uid,
