@@ -5,7 +5,8 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:fityes/account.dart';
 import 'package:fityes/home.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:fityes/api_config.dart'; 
+import 'user_session.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -61,9 +62,10 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final url = Uri.parse('http://192.168.43.151:5003/api/users/login');
+      //////////////////////////****************///////////////////// */
+     final baseUrl=ApiConfig.login();
       final response = await http.post(
-        url,
+        baseUrl,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       );
@@ -72,6 +74,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
+        
+          UserSession.userIdN = responseData['user']['_id']; // ou ['uid'] si c’est un login Firebase
+          print("ID enregistré : ${UserSession.userIdN}");
 
         if (responseData['message'] == 'Connexion réussie') {
           Navigator.pushReplacement(

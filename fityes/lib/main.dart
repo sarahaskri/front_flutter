@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  RegisterPage(),  // Redirige vers la page Home
+      home:  MealPlannerPage(),  // Redirige vers la page Home
     );
   }
 }

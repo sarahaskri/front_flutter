@@ -1,11 +1,19 @@
+import 'dart:convert';
+
+import 'package:fityes/api_config.dart';
 import 'package:fityes/home.dart';
+import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fityes/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est correct
 import 'package:fityes/breakfast_interface.dart';
+import 'package:http/http.dart' as http;
+import 'package:fityes/Todaymealdropdownstate.dart';
 
 class MealPlannerPage extends StatefulWidget {
+
   const MealPlannerPage({super.key});
+
 
   @override
   _MealPlannerPageState createState() => _MealPlannerPageState();
@@ -13,6 +21,7 @@ class MealPlannerPage extends StatefulWidget {
 
 class _MealPlannerPageState extends State<MealPlannerPage> {
   String selectedFrequency = "Weekly"; // Valeur initiale de la fréquence
+  String selectedMealType = "Breakfast";
 
   @override
   Widget build(BuildContext context) {
@@ -106,22 +115,34 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Today Meals",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  DropdownButton<String>(
-                    value: "Breakfast",
-                    items: const [
-                      DropdownMenuItem(
-                          value: "Breakfast", child: Text("Breakfast"))
-                    ],
-                    onChanged: null,
-                  )
+                  const Text(
+                    "Today Meals",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9fbef7),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Todaymealdropdownstate(
+                      onValueChanged: (newValue) {
+                        setState(() {
+                          selectedMealType = newValue;
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
-              const MealTile(name: "Salmon Nigiri", time: "7am", image: "🍣"),
-              const MealTile(name: "Lowfat Milk", time: "8am", image: "🥞"),
+              buildTodayMeals("breakfast"),
+              SizedBox(height: 16),
+              buildTodayMeals("lunch"),
+              SizedBox(height: 16),
+              buildTodayMeals("dinner"),
+              ////   const MealTile(name: "Salmon Nigiri", time: "7am", image: "🍣"),
+              /////   const MealTile(name: "Lowfat Milk", time: "8am", image: "🥞"),
 
               const SizedBox(height: 20),
               const Text("Find Something to Eat",
@@ -135,7 +156,6 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       title: "Breakfast",
                       subtitle: "120+ Foods",
                       imagePath: "assets/images/apple_pie.png",
-                      
                     ),
                     SizedBox(width: 10),
                     MealCategoryCardPink(
@@ -232,27 +252,66 @@ class NutritionChart extends StatelessWidget {
   }
 }
 
-class MealTile extends StatelessWidget {
-  final String name;
-  final String time;
-  final String image;
+Future<List<Map<String, dynamic>>> fetchTodayMeals(String mealType) async {
+  // Ajoute ton code ici pour récupérer les repas via l'API
+    final String? userIdN = UserSession.userIdN;
+ 
+print('userIdN: $userIdN');  
+final today = DateTime.now();
+  final date =
+      "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+  final baseUrl = ApiConfig.todayMeal();
 
-  const MealTile(
-      {super.key, required this.name, required this.time, required this.image});
+  final url = Uri.parse(
+      '$baseUrl/todaymeals?userId=$userIdN&mealType=$mealType&date=$date');
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        leading: Text(image, style: const TextStyle(fontSize: 32)),
-        title: Text(name),
-        subtitle: Text("Today | $time"),
-        trailing: const Icon(Icons.favorite_border),
-      ),
-    );
+  final response = await http.get(url);
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return List<Map<String, dynamic>>.from(data);
+  } else {
+    print("Erreur lors du fetch : ${response.body}");
+    return [];
   }
+}
+
+Widget buildTodayMeals(String mealType) {
+  return FutureBuilder<List<Map<String, dynamic>>>(
+    future: fetchTodayMeals(mealType),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator();
+      } else if (snapshot.hasError) {
+        return Text('Erreur : ${snapshot.error}');
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return Text("Aucun repas pour $mealType aujourd'hui");
+      } else {
+        final meals = snapshot.data!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              mealType.toUpperCase(),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            DropdownButton<String>(
+              value: meals.isNotEmpty ? meals.first['name'] : 'Sélectionner',
+              items: meals.map((meal) {
+                return DropdownMenuItem<String>(
+                  value: meal['name'],
+                  child: Text(meal['name']),
+                );
+              }).toList(),
+              onChanged: (selectedMeal) {
+                // Action à effectuer lorsque l'utilisateur choisit un repas
+                print("Repas sélectionné : $selectedMeal");
+              },
+            ),
+          ],
+        );
+      }
+    },
+  );
 }
 
 class MealCategoryCard extends StatelessWidget {
@@ -325,7 +384,7 @@ class MealCategoryCard extends StatelessWidget {
                 if (title == "Breakfast") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  BreakfastPage()),
+                    MaterialPageRoute(builder: (context) => BreakfastPage()),
                   );
                 } else if (title == "Lunch") {
                   Navigator.push(
@@ -371,7 +430,7 @@ class MealCategoryCardPink extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-           colors: [Color(0xFFFDDDE6), Color(0xFFD8B5FF)],
+          colors: [Color(0xFFFDDDE6), Color(0xFFD8B5FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -431,12 +490,10 @@ class MealCategoryCardPink extends StatelessWidget {
             ),
             child: TextButton(
               onPressed: () {
-                
-          
                 if (title == "Breakfast") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  BreakfastPage()),
+                    MaterialPageRoute(builder: (context) => BreakfastPage()),
                   );
                 } else if (title == "Lunch") {
                   Navigator.push(

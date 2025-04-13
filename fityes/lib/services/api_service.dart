@@ -134,4 +134,30 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+   static Future<List<dynamic>> getTodayMeals({
+    required String userId,
+    required String mealType,
+    required String date,
+  }) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/todayMeal?userId=$userId&mealType=$mealType&date=$date',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data; // retourne la liste des repas
+      } else {
+        print('Erreur serveur : ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erreur lors de la requête : $e');
+      return [];
+    }
+  }
 }
+

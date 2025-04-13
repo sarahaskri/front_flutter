@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:fityes/home.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:fityes/api_config.dart'; 
 
 class ProfilePage extends StatefulWidget {
   final String email; // L'email de l'utilisateur
@@ -22,10 +23,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> updateProfile(String email, String gender, int age,
       double weight, double height) async {
-    final url =
-        Uri.parse('http://192.168.1.13:5003/api/users/addProfileInformation');
+
+        ///////////////////////***************////////////////////////////// */
+             final baseUrl=ApiConfig.addProfileInformation();
+
     final response = await http.put(
-      url,
+      baseUrl,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": email,

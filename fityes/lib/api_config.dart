@@ -5,7 +5,12 @@ class ApiConfig {
 
   static String get baseUrl => 'http://$ip:$port$basePath';
 
-  // Exemple d'endpoint
+  //endpoint
   static Uri register() => Uri.parse('${baseUrl}users/register');
-    static Uri GoogleSignIn() => Uri.parse('${baseUrl}users/GoogleSignIn');
+    static Uri googleSignIn() => Uri.parse('${baseUrl}users/GoogleSignIn');
+    static Uri addMeal() => Uri.parse('${baseUrl}users/addMeal');
+  static Uri login() => Uri.parse('${baseUrl}users/login');
+  static Uri  addProfileInformation() => Uri.parse('${baseUrl}users/addProfileInformation');
+   static Uri  todayMeal() => Uri.parse('${baseUrl}users/todayMeal');
+
 }

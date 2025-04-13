@@ -1,4 +1,3 @@
-// account.dart
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fityes/LoginPage.dart';
@@ -9,7 +8,8 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fityes/api_config.dart'; 
+import 'package:fityes/api_config.dart';
+import 'user_session.dart';
 
 late TextEditingController _firstnameController;
 late TextEditingController _lastnameController;
@@ -56,8 +56,9 @@ class _RegisterPageState extends State<RegisterPage> {
       "email": _emailController.text,
       "password": _passwordController.text
     };
-     final baseUrl = ApiConfig.register(); 
-   
+
+    final baseUrl = ApiConfig.register();
+
     try {
       final response = await http.post(
         baseUrl,
@@ -66,6 +67,11 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+
+        UserSession.userIdN = responseData['_id'];
+        print("ID enregistré : ${UserSession.userIdN}");
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userEmail', _emailController.text);
 
@@ -171,7 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   _buildSocialButton("assets/images/google.png", () async {
                     UserCredential? userCredential =
-                        await _auth.loginWithGoogle();
+                        await _auth.loginWithGoogle(context);
                     if (userCredential != null) {
                       final email = userCredential.user?.email;
                       if (email != null && mounted) {
@@ -280,7 +286,7 @@ class _RegisterPageState extends State<RegisterPage> {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<UserCredential?> loginWithGoogle() async {
+  Future<UserCredential?> loginWithGoogle(BuildContext context) async {
     try {
       // Déconnexion de Google pour éviter les anciennes sessions
       await GoogleSignIn().signOut();
@@ -313,27 +319,17 @@ class AuthService {
         final firstName = nameParts.isNotEmpty ? nameParts[0] : "";
         final lastName = nameParts.length > 1 ? nameParts[1] : "";
 
-        // URL de l'API
-         final baseUrl = ApiConfig.GoogleSignIn(); 
-      
+        // Enregistrement de l'uid dans UserSession.userIdF
+        UserSession.userIdF = uid;
+        print("UID enregistré localement : ${UserSession.userIdF}");
 
-        // Envoi des données utilisateur au backend
-        final response = await http.post(
-          baseUrl, // Utilisation directe de la chaîne de caractères pour l'URL
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
-            "uid": uid,
-            "email": email,
-            "firstName": firstName,
-            "lastName": lastName,
-          }),
+        // Navigation vers la page de profil après la connexion
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(email: email),
+          ),
         );
-
-        if (response.statusCode == 200) {
-          print("Utilisateur Google enregistré !");
-        } else {
-          print("Erreur backend : ${response.body}");
-        }
       }
 
       return userCredential; // Retourne les informations d'authentification de l'utilisateur

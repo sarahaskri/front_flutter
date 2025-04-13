@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fityes/api_config.dart'; 
 
 class AddMealPage extends StatefulWidget {
   final String mealName;
@@ -137,11 +138,11 @@ class _AddMealPageState extends State<AddMealPage> {
     required String date,
     required String time,
   }) async {
-    final url = Uri.parse('http://192.168.43.151:5003/api/users/addMeal');
+    /////////////////////////////*********************//////////////////////////
+    final baseUrl = ApiConfig.addMeal();
 
- //   final url = Uri.parse('http://192.168.43.151/api/users/addMeal');
     final response = await http.post(
-      url,
+      baseUrl, // Use baseUrl directly as a String
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "userId": userId,
@@ -155,12 +156,12 @@ class _AddMealPageState extends State<AddMealPage> {
     print("Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      print("✅ Meal added successfully");
+      print(" Meal added successfully");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Meal added successfully')),
       );
     } else {
-      print("❌ Failed to add meal");
+      print(" Failed to add meal");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to add meal')),
       );
