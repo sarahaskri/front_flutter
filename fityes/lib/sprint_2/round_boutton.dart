@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
  
-import 'package:fityes/colo_extension.dart';
+import 'package:fityes/sprint_2/colo_extension.dart';
 enum RoundButtonType { bgGradient, bgSGradient , textGradient }
 
 class RoundButton extends StatelessWidget {

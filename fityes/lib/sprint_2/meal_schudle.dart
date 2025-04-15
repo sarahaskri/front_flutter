@@ -14,9 +14,9 @@ class MealSchedule extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Meal Schedule'),
+        title: const Text('Meal Schedule'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('No meals scheduled yet.'),
       ),
     );

@@ -6,7 +6,7 @@ import 'package:fityes/sprint_1/account.dart';
 import 'package:fityes/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:fityes/api_config.dart'; 
-import 'user_session.dart';
+import '../user_session.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 

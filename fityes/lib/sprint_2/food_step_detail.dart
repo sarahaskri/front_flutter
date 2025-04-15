@@ -1,7 +1,7 @@
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fityes/colo_extension.dart';
+import 'package:fityes/sprint_2/colo_extension.dart';
 
 class FoodStepDetailRow extends StatelessWidget {
   final Map sObj;

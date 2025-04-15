@@ -5,11 +5,11 @@ import 'package:fityes/home.dart';
 import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fityes/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est correct
-import 'package:fityes/breakfast_interface.dart';
+import 'package:fityes/sprint_2/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est correct
+import 'package:fityes/sprint_2/Breakfast/breakfast_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:fityes/Todaymealdropdownstate.dart';
-import 'user_session.dart';
+import '../user_session.dart';
 
 class MealPlannerPage extends StatefulWidget {
   const MealPlannerPage({super.key});
@@ -33,7 +33,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
     await UserSession.loadUserId();
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
-      print("userId dans addmeal: $userId");
+      print("userId dans today meals: $userId");
     });
   }
 
@@ -268,42 +268,25 @@ class NutritionChart extends StatelessWidget {
 
 Future<List<Map<String, dynamic>>> fetchTodayMeals(
     String userId, String mealType) async {
-  final today = DateTime.now();
-  final date =
-      "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
-
-  final String baseUrl =
-      ApiConfig.todayMeal().toString().replaceFirst('//users', '/users');
-  final Uri url = Uri.parse(baseUrl); // Plus besoin des paramètres dans l'URL
-  print('userId: $userId');
-  print('mealType: $mealType');
-  print('date: $date');
-
+  final baseUrl = ApiConfig.todayMeal();
   final response = await http.post(
-    url,
+    baseUrl,
     headers: {"Content-Type": "application/json"},
     body: jsonEncode({
-      'userId': userId,
-      'mealType': mealType,
-      'date': date,
+      "userId": userId,
+      "mealType": mealType,
+      
     }),
   );
 
-  print("POST URL: $url");
-  print("Body: ${response.body}");
-
   if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    if (data != null && data['meals'] != null) {
-  return List<Map<String, dynamic>>.from(data);
-    } else {
-      return [];
-    }
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['meals']);
   } else {
-    print("Erreur lors du fetch : ${response.body}");
-    return [];
+    throw Exception('Échec de chargement des repas');
   }
 }
+
 
 Widget buildTodayMeals(String mealType, String userId) {
   return FutureBuilder<List<Map<String, dynamic>>>(
@@ -325,11 +308,11 @@ Widget buildTodayMeals(String mealType, String userId) {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ...meals.map((meal) {
-              final name = meal['name'] ?? 'Nom inconnu';
+              final name = meal['mealName'] ?? 'Nom inconnu';
               final time = meal['time'] ?? 'Heure inconnue';
               return ListTile(
                 leading: const Icon(Icons.fastfood),
-                title: Text("Nom: $name"),
+                title: Text(" $name"),
                 subtitle: Text("Heure: $time"),
               );
             }).toList(),

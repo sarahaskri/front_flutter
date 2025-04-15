@@ -1,22 +1,22 @@
-import 'package:fityes/colo_extension.dart';
-import 'package:fityes/round_boutton.dart';
+import 'package:fityes/sprint_2/colo_extension.dart';
+import 'package:fityes/sprint_2/round_boutton.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
-import 'package:fityes/food_step_detail.dart';
-import 'package:fityes/addMeal.dart';
-import 'package:fityes/meal_schudle.dart';
+import 'package:fityes/sprint_2/food_step_detail.dart';
+import 'package:fityes/sprint_2/addMeal.dart';
+import 'package:fityes/sprint_2/meal_schudle.dart';
 
-class FoodInfoDetailsView extends StatefulWidget {
+class FoodInfoDetailsView1 extends StatefulWidget {
   final Map mObj;
   final Map dObj;
-  const FoodInfoDetailsView(
+  const FoodInfoDetailsView1(
       {super.key, required this.dObj, required this.mObj});
 
   @override
-  State<FoodInfoDetailsView> createState() => _FoodInfoDetailsViewState();
+  State<FoodInfoDetailsView1> createState() => _FoodInfoDetailsViewState1();
 }
 
-class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
+class _FoodInfoDetailsViewState1 extends State<FoodInfoDetailsView1> {
   List nutritionArr = [
     {"image": "assets/images/burn.png", "title": "180kCal"},
     {"image": "assets/images/egg.png", "title": "30g fats"},

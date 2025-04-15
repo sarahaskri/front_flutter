@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fityes/LoginPage.dart';
-import 'package:fityes/profilepage.dart';
+import 'package:fityes/sprint_1/LoginPage.dart';
+import 'package:fityes/sprint_1/profilepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';

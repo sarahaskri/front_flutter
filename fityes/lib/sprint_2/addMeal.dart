@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fityes/api_config.dart';
-import 'user_session.dart';
+import '../user_session.dart';
 
 class AddMealPage extends StatefulWidget {
   final String mealName;
