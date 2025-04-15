@@ -9,11 +9,10 @@ import 'package:fityes/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est
 import 'package:fityes/breakfast_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:fityes/Todaymealdropdownstate.dart';
+import 'user_session.dart';
 
 class MealPlannerPage extends StatefulWidget {
-
   const MealPlannerPage({super.key});
-
 
   @override
   _MealPlannerPageState createState() => _MealPlannerPageState();
@@ -22,6 +21,21 @@ class MealPlannerPage extends StatefulWidget {
 class _MealPlannerPageState extends State<MealPlannerPage> {
   String selectedFrequency = "Weekly"; // Valeur initiale de la fréquence
   String selectedMealType = "Breakfast";
+  String? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    await UserSession.loadUserId();
+    setState(() {
+      userId = UserSession.userIdN ?? UserSession.userIdF;
+      print("userId dans addmeal: $userId");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,11 +150,11 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                 ],
               ),
               const SizedBox(height: 10),
-              buildTodayMeals("breakfast"),
-              SizedBox(height: 16),
-              buildTodayMeals("lunch"),
-              SizedBox(height: 16),
-              buildTodayMeals("dinner"),
+              if (userId != null)
+                buildTodayMeals(selectedMealType, userId!)
+              else
+                const Center(child: CircularProgressIndicator()),
+
               ////   const MealTile(name: "Salmon Nigiri", time: "7am", image: "🍣"),
               /////   const MealTile(name: "Lowfat Milk", time: "8am", image: "🥞"),
 
@@ -252,35 +266,51 @@ class NutritionChart extends StatelessWidget {
   }
 }
 
-Future<List<Map<String, dynamic>>> fetchTodayMeals(String mealType) async {
-  // Ajoute ton code ici pour récupérer les repas via l'API
-    final String? userIdN = UserSession.userIdN;
- 
-print('userIdN: $userIdN');  
-final today = DateTime.now();
+Future<List<Map<String, dynamic>>> fetchTodayMeals(
+    String userId, String mealType) async {
+  final today = DateTime.now();
   final date =
       "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
-  final baseUrl = ApiConfig.todayMeal();
 
-  final url = Uri.parse(
-      '$baseUrl/todaymeals?userId=$userIdN&mealType=$mealType&date=$date');
+  final String baseUrl =
+      ApiConfig.todayMeal().toString().replaceFirst('//users', '/users');
+  final Uri url = Uri.parse(baseUrl); // Plus besoin des paramètres dans l'URL
+  print('userId: $userId');
+  print('mealType: $mealType');
+  print('date: $date');
 
-  final response = await http.get(url);
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      'userId': userId,
+      'mealType': mealType,
+      'date': date,
+    }),
+  );
+
+  print("POST URL: $url");
+  print("Body: ${response.body}");
+
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    return List<Map<String, dynamic>>.from(data);
+    if (data != null && data['meals'] != null) {
+  return List<Map<String, dynamic>>.from(data);
+    } else {
+      return [];
+    }
   } else {
     print("Erreur lors du fetch : ${response.body}");
     return [];
   }
 }
 
-Widget buildTodayMeals(String mealType) {
+Widget buildTodayMeals(String mealType, String userId) {
   return FutureBuilder<List<Map<String, dynamic>>>(
-    future: fetchTodayMeals(mealType),
+    future: fetchTodayMeals(userId, mealType),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return CircularProgressIndicator();
+        return const Center(child: CircularProgressIndicator());
       } else if (snapshot.hasError) {
         return Text('Erreur : ${snapshot.error}');
       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -292,21 +322,17 @@ Widget buildTodayMeals(String mealType) {
           children: [
             Text(
               mealType.toUpperCase(),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            DropdownButton<String>(
-              value: meals.isNotEmpty ? meals.first['name'] : 'Sélectionner',
-              items: meals.map((meal) {
-                return DropdownMenuItem<String>(
-                  value: meal['name'],
-                  child: Text(meal['name']),
-                );
-              }).toList(),
-              onChanged: (selectedMeal) {
-                // Action à effectuer lorsque l'utilisateur choisit un repas
-                print("Repas sélectionné : $selectedMeal");
-              },
-            ),
+            ...meals.map((meal) {
+              final name = meal['name'] ?? 'Nom inconnu';
+              final time = meal['time'] ?? 'Heure inconnue';
+              return ListTile(
+                leading: const Icon(Icons.fastfood),
+                title: Text("Nom: $name"),
+                subtitle: Text("Heure: $time"),
+              );
+            }).toList(),
           ],
         );
       }

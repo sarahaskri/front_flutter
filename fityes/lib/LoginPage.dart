@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:fityes/account.dart';
+import 'package:fityes/sprint_1/account.dart';
 import 'package:fityes/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:fityes/api_config.dart'; 

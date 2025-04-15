@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fityes/api_config.dart'; 
+import 'package:fityes/api_config.dart';
+import 'user_session.dart';
 
 class AddMealPage extends StatefulWidget {
   final String mealName;
@@ -30,15 +31,14 @@ class _AddMealPageState extends State<AddMealPage> {
   @override
   void initState() {
     super.initState();
-    _initializeUserId();
+    _loadUserId();
   }
 
-  Future<void> _initializeUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Si l'utilisateur vient de se connecter, enregistre-le ici une seule fois :
-    await prefs.setString("userId", "67dc99a16729127e6fecbe24");
+  Future<void> _loadUserId() async {
+    await UserSession.loadUserId();
     setState(() {
-      userId = prefs.getString("userId");
+      userId = UserSession.userIdN ?? UserSession.userIdF;
+      print("userId dans addmeal: $userId");
     });
   }
 

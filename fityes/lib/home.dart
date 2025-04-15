@@ -1,4 +1,4 @@
-import 'package:fityes/account.dart';
+import 'package:fityes/sprint_1/account.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {

@@ -9,7 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fityes/api_config.dart';
-import 'user_session.dart';
+import '../user_session.dart';
 
 late TextEditingController _firstnameController;
 late TextEditingController _lastnameController;
@@ -70,8 +70,8 @@ class _RegisterPageState extends State<RegisterPage> {
         final responseData = json.decode(response.body);
 
         UserSession.userIdN = responseData['_id'];
-        print("ID enregistré : ${UserSession.userIdN}");
-
+        print("ID enregistré dans page account: ${UserSession.userIdN}");
+        UserSession.setUserIdN(responseData['_id']);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userEmail', _emailController.text);
 

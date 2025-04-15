@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';  // Import nécessaire pour initialiser Firebase
 import 'package:fityes/LoginPage.dart';
-import 'package:fityes/account.dart';
+import 'package:fityes/sprint_1/account.dart';
 import 'package:fityes/breakfast_interface.dart';
 import 'package:fityes/food_info_detail_pancake.dart';
 import 'package:fityes/home.dart';  // Assurez-vous que Home est bien importé
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  MealPlannerPage(),  // Redirige vers la page Home
+      home:  Home(),  // Redirige vers la page Home
     );
   }
 }
