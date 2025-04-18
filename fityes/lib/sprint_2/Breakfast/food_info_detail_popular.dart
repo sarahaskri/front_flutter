@@ -199,7 +199,7 @@ class _FoodInfoDetailsViewState1 extends State<FoodInfoDetailsView1> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   Text(
-                                    "by James Ruth",
+                                    "by FitYes Chef",
                                     style: TextStyle(
                                         color: TColor.gray, fontSize: 12),
                                   ),

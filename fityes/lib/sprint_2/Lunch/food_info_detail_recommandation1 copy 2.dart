@@ -5,39 +5,41 @@ import 'package:readmore/readmore.dart';
 import 'package:fityes/sprint_2/food_step_detail.dart';
 import 'package:fityes/sprint_2/addMeal.dart';
 
-class FoodInfoDetailsViewREC2 extends StatefulWidget {
+class FoodInfoDetailsViewLunchREC1 extends StatefulWidget {
   final Map mObj;
   final Map dObj;
-  const FoodInfoDetailsViewREC2({super.key, required this.dObj, required this.mObj});
+  const FoodInfoDetailsViewLunchREC1({super.key, required this.dObj, required this.mObj});
 
   @override
-  State<FoodInfoDetailsViewREC2> createState() => _FoodInfoDetailsViewStateREC2();
+  State<FoodInfoDetailsViewLunchREC1> createState() => _FoodInfoDetailsViewStateLunchREC1();
 }
 
-class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
-  List nutritionArr = [
-    {"image": "assets/images/burn.png", "title": "275kCal"},
-    {"image": "assets/images/egg.png", "title": "15g fats"},
-    {"image": "assets/images/proteins.png", "title": "30g proteins"},
-    {"image": "assets/images/carbo.png", "title": "20g carbo"},
-  ];
+class _FoodInfoDetailsViewStateLunchREC1 extends State<FoodInfoDetailsViewLunchREC1> {
+List nutritionArr = [
+  {"image": "assets/images/burn.png", "title": "350kCal"},
+  {"image": "assets/images/egg.png", "title": "10g fats"},
+  {"image": "assets/images/proteins.png", "title": "35g proteins"},
+  {"image": "assets/images/carbo.png", "title": "40g carbo"},
+];
 
-  List ingredientsArr = [
-    {"image": "assets/images/chicken.png", "title": "Chicken Breast", "value": "150g"},
-    {"image": "assets/images/breadcrumbs.png", "title": "Bread Crumbs", "value": "50g"},
-    {"image": "assets/images/eggs.png", "title": "Egg", "value": "1"},
-    {"image": "assets/images/oil.png", "title": "Oil", "value": "2 tbsp"},
-    {"image": "assets/images/spices.png", "title": "Spices", "value": "to taste"},
-  ];
+List ingredientsArr = [
+  {"image": "assets/images/chicken.png", "title": "Grilled Chicken", "value": "150g"},
+  {"image": "assets/images/quinoa.png", "title": "Cooked Quinoa", "value": "100g"},
+  {"image": "assets/images/spinach.png", "title": "Spinach", "value": "50g"},
+  {"image": "assets/images/pepper.png", "title": "Bell Peppers", "value": "50g"},
+  {"image": "assets/images/oil.png", "title": "Olive Oil", "value": "1 tbsp"},
+  {"image": "assets/images/spices.png", "title": "Spices", "value": "to taste"},
+];
 
-  List stepArr = [
-    {"no": "1", "detail": "Flatten the chicken breast with a meat mallet."},
-    {"no": "2", "detail": "Season the chicken with salt, pepper and spices."},
-    {"no": "3", "detail": "Dip the chicken into beaten egg."},
-    {"no": "4", "detail": "Coat the chicken with breadcrumbs."},
-    {"no": "5", "detail": "Heat oil in a pan and fry until golden brown on both sides."},
-    {"no": "6", "detail": "Serve hot with lemon slices or dipping sauce."},
-  ];
+
+List stepArr = [
+  {"no": "1", "detail": "Grill the chicken breast with olive oil and spices."},
+  {"no": "2", "detail": "Cook quinoa in water until fluffy."},
+  {"no": "3", "detail": "Sauté spinach and bell peppers lightly."},
+  {"no": "4", "detail": "Mix quinoa, veggies and chicken in a bowl."},
+  {"no": "5", "detail": "Season with salt, pepper and olive oil."},
+  {"no": "6", "detail": "Serve warm and enjoy your healthy meal."},
+];
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +187,8 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: ReadMoreText(
-                          'Readed Cutlet is a crispy and flavorful chicken dish. It is made with a slice of chicken breast coated in breadcrumbs and spices, then fried until golden brown. This is a perfect option for a protein-rich meal.',
+                      'The Quinoa Chicken Bowl is a balanced and nutritious meal packed with protein, fiber, and essential nutrients. It combines grilled chicken with fluffy quinoa and sautéed vegetables for a delicious and healthy lunch option.',
+
                           trimLines: 4,
                           colorClickableText: TColor.black,
                           trimMode: TrimMode.Line,

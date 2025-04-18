@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:fityes/api_config.dart';
 import 'package:fityes/home.dart';
+import 'package:fityes/sprint_2/Dinner/dinner_interface.dart';
+import 'package:fityes/sprint_2/Lunch/lunch_interface.dart';
 import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fityes/sprint_2/MealsItemsDropdown.dart'; // Assure-toi que ce chemin est correct
 import 'package:fityes/sprint_2/Breakfast/breakfast_interface.dart';
 import 'package:http/http.dart' as http;
-import 'package:fityes/Todaymealdropdownstate.dart';
+import 'package:fityes/sprint_2/Todaymealdropdownstate.dart';
 import '../user_session.dart';
 
 class MealPlannerPage extends StatefulWidget {
@@ -398,12 +400,12 @@ class MealCategoryCard extends StatelessWidget {
                 } else if (title == "Lunch") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Home()),
+                    MaterialPageRoute(builder: (context) => LunchPage()),
                   );
                 } else if (title == "Dinner") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Home()),
+                    MaterialPageRoute(builder: (context) => DinnerPage()),
                   );
                 }
               },
@@ -507,12 +509,12 @@ class MealCategoryCardPink extends StatelessWidget {
                 } else if (title == "Lunch") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Home()),
+                    MaterialPageRoute(builder: (context) => LunchPage()),
                   );
                 } else if (title == "Dinner") {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Home()),
+                    MaterialPageRoute(builder: (context) => DinnerPage()),
                   );
                 }
               },

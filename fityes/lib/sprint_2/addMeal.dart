@@ -46,7 +46,7 @@ class _AddMealPageState extends State<AddMealPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add to ${widget.mealName} Meal'),
+        title: Text('Add to ${widget.mealType} Meal'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

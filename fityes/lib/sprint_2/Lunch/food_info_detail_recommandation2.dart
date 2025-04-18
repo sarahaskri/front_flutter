@@ -5,49 +5,62 @@ import 'package:readmore/readmore.dart';
 import 'package:fityes/sprint_2/food_step_detail.dart';
 import 'package:fityes/sprint_2/addMeal.dart';
 
-class FoodInfoDetailsViewREC2 extends StatefulWidget {
+class FoodInfoDetailsViewLunchREC2 extends StatefulWidget {
   final Map mObj;
   final Map dObj;
-  const FoodInfoDetailsViewREC2({super.key, required this.dObj, required this.mObj});
+  const FoodInfoDetailsViewLunchREC2(
+      {super.key, required this.dObj, required this.mObj});
 
   @override
-  State<FoodInfoDetailsViewREC2> createState() => _FoodInfoDetailsViewStateREC2();
+  State<FoodInfoDetailsViewLunchREC2> createState() =>
+      _FoodInfoDetailsViewStateLunchREC2();
 }
 
-class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
+class _FoodInfoDetailsViewStateLunchREC2
+    extends State<FoodInfoDetailsViewLunchREC2> {
   List nutritionArr = [
-    {"image": "assets/images/burn.png", "title": "275kCal"},
-    {"image": "assets/images/egg.png", "title": "15g fats"},
-    {"image": "assets/images/proteins.png", "title": "30g proteins"},
-    {"image": "assets/images/carbo.png", "title": "20g carbo"},
+    {"image": "assets/images/burn.png", "title": "320kCal"},
+    {"image": "assets/images/egg.png", "title": "18g fats"},
+    {"image": "assets/images/proteins.png", "title": "12g proteins"},
+    {"image": "assets/images/carbo.png", "title": "28g carbo"},
   ];
 
   List ingredientsArr = [
-    {"image": "assets/images/chicken.png", "title": "Chicken Breast", "value": "150g"},
-    {"image": "assets/images/bread.png", "title": "Bread Crumbs", "value": "50g"},
-    {"image": "assets/images/eggs.png", "title": "Egg", "value": "1"},
-    {"image": "assets/images/oil.png", "title": "Oil", "value": "2 tbsp"},
-    {"image": "assets/images/spices.png", "title": "Spices", "value": "to taste"},
+    {"image": "assets/images/avocado.png", "title": "Avocado", "value": "1/2"},
+    {"image": "assets/images/eggs.png", "title": "Boiled Egg", "value": "1"},
+    {
+      "image": "assets/images/bread.png",
+      "title": " Wheat Bread",
+      "value": "2 slices"
+    },
+    {"image": "assets/images/oil.png", "title": "Olive Oil", "value": "1 tsp"},
+    {
+      "image": "assets/images/spices.png",
+      "title": "Salt & Pepper",
+      "value": "to taste"
+    },
   ];
 
   List stepArr = [
-    {"no": "1", "detail": "Flatten the chicken breast with a meat mallet."},
-    {"no": "2", "detail": "Season the chicken with salt, pepper and spices."},
-    {"no": "3", "detail": "Dip the chicken into beaten egg."},
-    {"no": "4", "detail": "Coat the chicken with breadcrumbs."},
-    {"no": "5", "detail": "Heat oil in a pan and fry until golden brown on both sides."},
-    {"no": "6", "detail": "Serve hot with lemon slices or dipping sauce."},
+    {"no": "1", "detail": "Toast the bread slices until golden."},
+    {"no": "2", "detail": "Mash the avocado and season with salt and pepper."},
+    {
+      "no": "3",
+      "detail": "Slice the boiled egg and layer on one slice of bread."
+    },
+    {"no": "4", "detail": "Spread mashed avocado on top."},
+    {"no": "5", "detail": "Top with the other slice of bread and serve."},
   ];
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     return Container(
-      decoration: BoxDecoration(gradient: LinearGradient(colors: TColor.primaryG)),
+      decoration:
+          BoxDecoration(gradient: LinearGradient(colors: TColor.primaryG)),
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
-             SliverAppBar(
+            SliverAppBar(
               backgroundColor: Colors.transparent,
               centerTitle: true,
               elevation: 0,
@@ -92,7 +105,7 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                 )
               ],
             ),
-         SliverAppBar(
+            SliverAppBar(
               backgroundColor: Colors.transparent,
               centerTitle: true,
               elevation: 0,
@@ -136,7 +149,8 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
         body: Container(
           decoration: BoxDecoration(
               color: TColor.white,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(25), topRight: Radius.circular(25))),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Stack(
@@ -174,7 +188,8 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                                 ],
                               ),
                             ),
-                            Image.asset("assets/images/fav.png", width: 15, height: 15),
+                            Image.asset("assets/images/fav.png",
+                                width: 15, height: 15),
                           ],
                         ),
                       ),
@@ -185,20 +200,23 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: ReadMoreText(
-                          'Readed Cutlet is a crispy and flavorful chicken dish. It is made with a slice of chicken breast coated in breadcrumbs and spices, then fried until golden brown. This is a perfect option for a protein-rich meal.',
+                          'A nutritious and delicious sandwich made with mashed avocado, sliced hard-boiled eggs, and toasted whole grain bread. Perfect for a quick and healthy breakfast or lunch. Rich in healthy fats, protein, and fiber',
                           trimLines: 4,
                           colorClickableText: TColor.black,
                           trimMode: TrimMode.Line,
                           trimCollapsedText: ' Read More ...',
                           trimExpandedText: ' Read Less',
                           style: TextStyle(color: TColor.gray, fontSize: 12),
-                          moreStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                          moreStyle: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w700),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      _buildSectionTitle("Ingredients That You\nWill Need", itemCount: ingredientsArr.length),
+                      _buildSectionTitle("Ingredients That You\nWill Need",
+                          itemCount: ingredientsArr.length),
                       _buildIngredientList(media),
-                      _buildSectionTitle("Step by Step", itemCount: stepArr.length),
+                      _buildSectionTitle("Step by Step",
+                          itemCount: stepArr.length),
                       _buildStepsList(),
                       const SizedBox(height: 80),
                     ],
@@ -217,8 +235,10 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => AddMealPage(
-                                          mealName: widget.dObj["name"].toString(),
-                                          mealType: widget.mObj["name"].toString(),
+                                          mealName:
+                                              widget.dObj["name"].toString(),
+                                          mealType:
+                                              widget.mObj["name"].toString(),
                                         )));
                           },
                         ),
@@ -242,7 +262,9 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
         children: [
           Text(title,
               style: TextStyle(
-                  color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700)),
+                  color: TColor.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700)),
           if (itemCount != null)
             TextButton(
               onPressed: () {},
@@ -310,7 +332,8 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
                 ),
                 const SizedBox(height: 4),
                 Text(ing["title"], style: TextStyle(fontSize: 12)),
-                Text(ing["value"], style: TextStyle(fontSize: 10, color: TColor.gray)),
+                Text(ing["value"],
+                    style: TextStyle(fontSize: 10, color: TColor.gray)),
               ],
             ),
           );
@@ -326,7 +349,8 @@ class _FoodInfoDetailsViewStateREC2 extends State<FoodInfoDetailsViewREC2> {
       itemCount: stepArr.length,
       itemBuilder: (context, index) {
         var step = stepArr[index];
-        return FoodStepDetailRow(sObj: step, isLast: index == stepArr.length - 1);
+        return FoodStepDetailRow(
+            sObj: step, isLast: index == stepArr.length - 1);
       },
     );
   }
