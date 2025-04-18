@@ -47,6 +47,7 @@ dependencies:
   fl_chart: ^0.70.2
   readmore: ^2.2.0
   dotted_dashed_line: ^0.0.3 
+  lucide_icons: ^0.257.0
  
 dev_dependencies:
   flutter_test:

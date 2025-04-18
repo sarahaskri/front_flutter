@@ -39,6 +39,7 @@ class _AddMealPageState extends State<AddMealPage> {
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
       print("userId dans addmeal: $userId");
+      
     });
   }
 

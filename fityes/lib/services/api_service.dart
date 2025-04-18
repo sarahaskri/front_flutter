@@ -159,5 +159,90 @@ class ApiService {
       return [];
     }
   }
+  //////////////////
+   static Future<List<dynamic>> getAllMealsByAdmin() async {
+    final Uri url = Uri.parse('$baseUrl/getAllMealsByAdmin');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        print('Erreur serveur : ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erreur lors de la requête : $e');
+      return [];
+    }
+  }
+
+  ///// 
+   static Future<bool> addMealByAdmin(Map<String, dynamic> mealData) async {
+    final Uri url = Uri.parse('$baseUrl/addMealByAdmin');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(mealData),
+      );
+
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        print('Erreur ajout : ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erreur lors de l\'ajout : $e');
+      return false;
+    }
+  }
+
+  //// 
+    static Future<bool> updateMealByAdmin(String mealId, Map<String, dynamic> mealData) async {
+    final Uri url = Uri.parse('$baseUrl/updateMealByAdmin/$mealId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(mealData),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erreur modification : ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erreur lors de la modification : $e');
+      return false;
+    }
+  }
+  ///////// 
+  static Future<bool> deleteMealByAdmin(String mealId) async {
+    final Uri url = Uri.parse('$baseUrl/deleteMealByAdmin/$mealId');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erreur suppression : ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erreur lors de la suppression : $e');
+      return false;
+    }
+  }
+
+
+
 }
 

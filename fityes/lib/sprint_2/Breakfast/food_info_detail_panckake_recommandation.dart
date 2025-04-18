@@ -449,6 +449,7 @@ class _FoodInfoDetailsViewStateREC1 extends State<FoodInfoDetailsViewREC1> {
                                                 widget.dObj["name"].toString(),
                                             mealType: widget.mObj["name"]
                                                 .toString(),
+                                            
                                           )));
                             }),
                       ),
