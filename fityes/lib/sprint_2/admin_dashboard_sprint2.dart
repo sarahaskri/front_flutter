@@ -19,12 +19,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
     fetchMeals();
   }
 
-  void fetchMeals() async {
-    final data = await adminService.getMealByAdmin();
-    setState(() {
-      meals = data;
-    });
-  }
+void fetchMeals() async {
+  final fetchedMeals = await adminService.getMealByAdmin();
+  setState(() {
+    meals = fetchedMeals;
+  });
+}
+
 
   void deleteMeal(String id) async {
     await adminService.deleteMealByAdmin(id);

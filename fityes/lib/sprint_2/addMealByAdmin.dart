@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:fityes/sprint_2/mealModelAdmin.dart';
 import 'package:fityes/sprint_2/admin_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddMealByAdmin extends StatefulWidget {
   @override
@@ -11,49 +15,56 @@ class AddMealByAdmin extends StatefulWidget {
 class _AddMealByAdminState extends State<AddMealByAdmin> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
   String selectedType = 'Breakfast';
-  DateTime selectedDate = DateTime.now();
+  String? imagePath;
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-    if (picked != null) setState(() => selectedDate = picked);
+  String? role;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
   }
 
-void _selectTime(BuildContext context) async {
-  final TimeOfDay? picked = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay(hour: 8, minute: 0),
-  );
-  if (picked != null) {
-    final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+  Future<void> _loadUserRole() async {
+    await UserRole.loadRole();
     setState(() {
-      timeController.text = formattedTime;
+      role = UserRole.role;
+      print("Rôle chargé dans addMealByAdmin : $role");
     });
   }
-}
 
+  Future<void> _selectImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        imagePath = pickedFile.path;
+      });
+    }
+  }
 
   void _addMeal() async {
     if (_formKey.currentState!.validate()) {
+      String base64Image = '';
+      if (imagePath != null) {
+        final bytes = await File(imagePath!).readAsBytes();
+        base64Image = base64Encode(bytes);
+      }
+
       final newMeal = Meal(
         mealName: nameController.text,
         mealType: selectedType,
-        date: DateFormat('yyyy-MM-dd').format(selectedDate),
-        time: timeController.text,
         description: '',
-        imagePath: '',
+        imagePath: base64Image,
         nutrition: {},
-       id: '',
+        id: '',
+        role: role,
+       date: '', time: '',
       );
 
       await AdminService().addMealByAdmin(newMeal);
-      Navigator.pop(context, true); // revenir à la page précédente
+      Navigator.pop(context, true);
     }
   }
 
@@ -70,29 +81,33 @@ void _selectTime(BuildContext context) async {
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(labelText: 'Nom du repas'),
-                validator: (value) => value!.isEmpty ? 'Champ requis' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Champ requis' : null,
               ),
               DropdownButtonFormField<String>(
                 value: selectedType,
                 decoration: InputDecoration(labelText: 'Type'),
                 items: ['Breakfast', 'Lunch', 'Dinner']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .map((e) =>
+                        DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (val) => setState(() => selectedType = val!),
               ),
-              TextFormField(
-                readOnly: true,
-                controller: TextEditingController(
-                    text: DateFormat('yyyy-MM-dd').format(selectedDate)),
-                onTap: () => _selectDate(context),
-                decoration: InputDecoration(labelText: 'Date'),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _selectImage,
+                child: Text("Sélectionner une image"),
               ),
-              TextFormField(
-                controller: timeController,
-                readOnly: true,
-                onTap: () => _selectTime(context),
-                decoration: InputDecoration(labelText: 'Heure'),
-              ),
+              if (imagePath != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Image.file(
+                    File(imagePath!),
+                    height: 150,
+                    width: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _addMeal,

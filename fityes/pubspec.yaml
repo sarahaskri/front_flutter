@@ -48,6 +48,7 @@ dependencies:
   readmore: ^2.2.0
   dotted_dashed_line: ^0.0.3 
   lucide_icons: ^0.257.0
+  image_picker: ^1.1.2
  
 dev_dependencies:
   flutter_test:

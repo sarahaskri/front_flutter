@@ -72,6 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
         UserSession.userIdN = responseData['_id'];
         print("ID enregistré dans page account: ${UserSession.userIdN}");
         UserSession.setUserIdN(responseData['_id']);
+        
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userEmail', _emailController.text);
 

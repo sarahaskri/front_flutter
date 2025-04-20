@@ -1,13 +1,19 @@
 
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:fityes/api_config.dart';
 import 'package:fityes/sprint_2/Dinner/categoryMeal_listDinner.dart';
 import 'package:fityes/sprint_2/Lunch/categoryMeal_listLunch.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation1%20copy%202.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation2.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation3.dart';
+import 'package:fityes/sprint_2/mealModelAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular.dart';
 import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular2.dart';
 import 'package:fityes/user_session.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fityes/sprint_2/Dinner/categoryMeal_listDinner.dart';
 import 'package:fityes/sprint_2/Dinner/mealCategoryforDinner.dart';
@@ -34,10 +40,24 @@ class DinnerPage extends StatefulWidget {
 
 class _DinnerPagePageState extends State<DinnerPage> {
   String? userId;
+  late Future<List<Meal>> _futureBreakfast;
+
+  Future<List<Meal>> getMealsByType(String type) async {
+    final uri = ApiConfig.getMealsByType(type);
+    final res = await http.get(uri, headers: {'Content-Type': 'application/json'});
+
+    if (res.statusCode != 200) {
+      throw Exception('Erreur ${res.statusCode}');
+    }
+    final List<dynamic> data = json.decode(res.body);
+    
+    return data.map((e) => Meal.fromJson(e as Map<String, dynamic>)).toList();
+  }
 
   @override
   void initState() {
     super.initState();
+    _futureBreakfast = getMealsByType('Dinner');
     _loadUserId();
   }
 
@@ -50,7 +70,7 @@ class _DinnerPagePageState extends State<DinnerPage> {
   }
 
   void addMealToSchedule(String mealName, BuildContext context) {
-    String mealType = "dinner";
+    String mealType = "Dinner";
     String date = DateTime.now().toString().split(' ')[0];
     String time = TimeOfDay.now().format(context);
 
@@ -171,6 +191,7 @@ class _DinnerPagePageState extends State<DinnerPage> {
                     subtitle: "Easy | 290KCal",
                     imagePath: "assets/images/veggie_wrap.png",
                   ),
+                  
                 ],
               ),
             ),
@@ -185,8 +206,76 @@ class _DinnerPagePageState extends State<DinnerPage> {
             ),
             _buildRecipeCarforpopular_2(context, 'Basil omelette',
                 'Medium | 20mins | 120kCal', 'assets/images/omelette.png'),
+                    const SizedBox(height: 30),
+            _buildSectionTitle(context, 'All Breakfast'),
+
+            FutureBuilder<List<Meal>>(
+              future: _futureBreakfast,
+              builder: (ctx, snap) {
+                if (snap.connectionState != ConnectionState.done) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snap.hasError) {
+                  return Text('Erreur : ${snap.error}');
+                }
+                final meals = snap.data!;
+                if (meals.isEmpty) {
+                  return Text('Aucun repas trouvé');
+                }
+                return Column(
+                  children: meals.map((m) => _buildDynamicRecipeTile(context, m)).toList(),
+                );
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+
+  Widget _buildDynamicRecipeTile(BuildContext ctx, Meal meal) {
+    Uint8List? bytes;
+
+    if (meal.imagePath.isNotEmpty) {
+      try {
+        bytes = base64Decode(meal.imagePath); // Corrected decoding
+      } catch (e) {
+        print('Error decoding image: $e');
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: bytes != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.memory(
+                  bytes,
+                  height: 50,
+                  width: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.fastfood, size: 40, color: Colors.grey);
+                  },
+                ),
+              )
+            : Icon(Icons.fastfood, size: 40, color: Colors.grey),
+        title: Text(meal.mealName, style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('${meal.time} · ${meal.date}'),
+
       ),
     );
   }

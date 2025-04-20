@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:math';
+import 'package:fityes/principal_dash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:fityes/sprint_1/account.dart';
 import 'package:fityes/home.dart';
 import 'package:http/http.dart' as http;
-import 'package:fityes/api_config.dart'; 
+import 'package:fityes/api_config.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
 import '../user_session.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -53,48 +56,66 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> loginUser(String email, String password) async {
-    if (email.isEmpty || password.isEmpty) {
-      _showErrorDialog("Veuillez remplir tous les champs.");
-      return;
-    }
 
-    setState(() => _isLoading = true);
-
-    try {
-      //////////////////////////****************///////////////////// */
-     final baseUrl=ApiConfig.login();
-      final response = await http.post(
-        baseUrl,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email, 'password': password}),
-      );
-
-      setState(() => _isLoading = false);
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        
-          UserSession.userIdN = responseData['user']['_id']; // ou ['uid'] si c’est un login Firebase
-          print("ID enregistré : ${UserSession.userIdN}");
-
-        if (responseData['message'] == 'Connexion réussie') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Home()),
-          );
-        } else {
-          _showErrorDialog(responseData['message'] ?? 'Erreur inconnue');
-        }
-      } else {
-        _showErrorDialog('Adresse e-mail ou mot de passe erroné.');
-      }
-    } catch (e) {
-      setState(() => _isLoading = false);
-      _showErrorDialog('Erreur de connexion au serveur.');
-    }
+Future<void> loginUser (String email, String password) async {
+  if (email.isEmpty || password.isEmpty) {
+    _showErrorDialog("Veuillez remplir tous les champs.");
+    return;
   }
 
+  setState(() => _isLoading = true);
+
+  try {
+    final baseUrl = ApiConfig.login();
+    final response = await http.post(
+      baseUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email, 'password': password}),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final user = responseData['user'] ?? responseData; 
+
+      if (user['_id'] == null) {
+        _showErrorDialog("ID utilisateur introuvable dans la réponse.");
+        return;
+      }
+
+      // Sauvegarde des données
+      await UserSession.setUserIdN(user['_id']);
+      await UserRole.setRole(user['role']);
+      print("Connexion réussie - ID: ${UserSession.userIdN}, Role: ${UserRole.role}");
+
+      // Navigation en fonction du rôle
+      if (user['role'] == 'admin') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) =>  AdminDashboardPage()), // Remplacez par la page admin si nécessaire
+        );
+        return; // Ajout d'un return pour éviter d'exécuter le code suivant
+      } else if (user['role'] == 'adherent') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()), // Remplacez par la page adhérent si nécessaire
+        );
+        return; // Ajout d'un return pour éviter d'exécuter le code suivant
+      } else {
+        _showErrorDialog("Rôle utilisateur non reconnu.");
+        return; // Ajout d'un return pour éviter d'exécuter le code suivant
+      }
+    } else {
+      final errorData = json.decode(response.body);
+      _showErrorDialog(errorData['message'] ?? 'Adresse e-mail ou mot de passe erroné.');
+    }
+  } catch (e) {
+    setState(() => _isLoading = false);
+    print("Erreur: $e");
+    _showErrorDialog('Erreur de connexion au serveur.');
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

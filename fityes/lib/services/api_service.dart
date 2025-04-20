@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fityes/sprint_2/mealModelAdmin.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -241,6 +242,21 @@ class ApiService {
       return false;
     }
   }
+  ///////////////////
+  static Future<List<Meal>> getMealsByType(String type) async {
+    final response = await http.get(Uri.parse('$baseUrl/getMealsByType/$type'));
+
+    // Vérifier si la requête est réussie (code 200)
+    if (response.statusCode == 200) {
+      // Si le serveur renvoie une réponse OK, parsez les données
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((meal) => Meal.fromJson(meal)).toList(); // Convertir chaque élément en objet Meal
+    } else {
+      // Si la réponse n'est pas OK, lancez une exception
+      throw Exception('Failed to load meals: ${response.statusCode}');
+    }
+  }
+
 
 
 

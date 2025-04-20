@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';  // Import nécessaire pour initialiser Firebase
 import 'package:fityes/principal_dash.dart';
+import 'package:fityes/sprint_1/profilepage.dart';
 import 'package:fityes/sprint_2/admin_dashboard_sprint2.dart';
 import 'package:fityes/sprint_1/LoginPage.dart';
 import 'package:fityes/sprint_1/account.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  AdminDashboardPage(),  
+      home: RegisterPage() ,  
     
       // Redirige vers la page Home
     );

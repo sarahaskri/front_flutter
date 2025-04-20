@@ -9,7 +9,7 @@ class AdminDashboardPage extends StatefulWidget {
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int selectedIndex = 0;
-  bool isMenuOpen = true;
+  bool isMenuOpen = false;
 
   final List<String> menuItems = [
     'Home', 'Admins', 'Users', 'Meals', 'Workouts', 'Notifications'

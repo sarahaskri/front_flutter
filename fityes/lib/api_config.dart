@@ -15,5 +15,9 @@ class ApiConfig {
    static Uri  getAllMealsByAdmin() => Uri.parse('${baseUrl}users/getAllMealsByAdmin');
     static Uri  addMealByAdmin() => Uri.parse('${baseUrl}users/addMealByAdmin');
   static Uri  updateMealByAdmin() => Uri.parse('${baseUrl}users/updateMealByAdmin');
-  static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');
+  static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');  
+
+  static Uri getMealsByType(String mealType) =>
+    Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
+
 }

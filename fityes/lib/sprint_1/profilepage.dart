@@ -83,7 +83,7 @@ print(response.body);
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 40.0),

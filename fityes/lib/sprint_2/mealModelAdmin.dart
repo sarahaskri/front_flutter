@@ -7,6 +7,8 @@ class Meal {
   final String imagePath;
   final String date;
   final String time;
+  String? role;
+ 
 
   Meal({
     required this.id,
@@ -17,6 +19,9 @@ class Meal {
     required this.imagePath,
     required this.date,
     required this.time,
+    this.role,
+    
+
   });
 
   factory Meal.fromJson(Map<String, dynamic> json) {
@@ -34,6 +39,7 @@ class Meal {
       imagePath: json['imagePath'] ?? '',
       date: json['date'] ?? '',
       time: json['time'] ?? '',
+        role: json['role'],
     );
   }
 
@@ -46,6 +52,7 @@ class Meal {
       'imagePath': imagePath,
       'date': date,
       'time': time,
+        'role': role,
     };
   }
 }
