@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:fityes/sprint_2/Breakfast/mealCategory.dart';
+import 'package:fityes/sprint_2/Dinner/mealCategoryforDinner.dart';
+import 'package:fityes/sprint_2/Lunch/mealCategoryforLunch.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -8,9 +11,10 @@ import '../user_session.dart';
 
 class AddMealPage extends StatefulWidget {
   final String mealName;
-  final String mealType; // Ajouter le paramètre mealType
+  final String mealType;
+  final String imagepath; // Ajouter le paramètre mealType
 
-  AddMealPage({required this.mealName, required this.mealType});
+  AddMealPage({required this.mealName, required this.mealType, required this.imagepath});
 
   @override
   _AddMealPageState createState() => _AddMealPageState();
@@ -39,7 +43,6 @@ class _AddMealPageState extends State<AddMealPage> {
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
       print("userId dans addmeal: $userId");
-      
     });
   }
 
@@ -107,6 +110,7 @@ class _AddMealPageState extends State<AddMealPage> {
               },
             ),
             const SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 if (dateController.text.isNotEmpty &&
@@ -117,11 +121,12 @@ class _AddMealPageState extends State<AddMealPage> {
                     mealName: widget.mealName,
                     date: dateController.text,
                     time: timeController.text,
+                    imagepath: widget.imagepath,
+                    nutrition: _getMealNutrition(), // Replace {} with actual nutrition data if available
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Please select a date and time')),
+                    const SnackBar(content: Text('Please select a date and time')),
                   );
                 }
               },
@@ -133,14 +138,65 @@ class _AddMealPageState extends State<AddMealPage> {
     );
   }
 
+  Map<String, String> _getMealNutrition() {
+    if (widget.mealType == "Breakfast") {
+      final allMeals = categoryMeals.values.expand((m) => m).toList();
+      final meal = allMeals.firstWhere(
+        (m) => m.name == widget.mealName,
+        orElse: () => const MealExample(
+          name: '',
+          category: '',
+          description: '',
+          nutrition: {},
+          imagePath: '',
+        ),
+      );
+      return cleanNutritionDatabreakfast(meal.nutrition);
+    }
+
+    if (widget.mealType == "Lunch") {
+      final lunchAllMeals = lunchcategoryMeals.values.expand((m) => m).toList();
+      final meal = lunchAllMeals.firstWhere(
+        (m) => m.name == widget.mealName,
+        orElse: () => const MealExampleForLunch(
+          name: '',
+          category: '',
+          description: '',
+          nutrition: {},
+          imagePath: '',
+        ),
+      );
+      return cleanNutritionDatalunch(meal.nutrition);
+    }
+
+    if (widget.mealType == "Dinner") {
+      final dinnerAllMeals = dinnerCategoryMeals.values.expand((m) => m).toList();
+      final meal = dinnerAllMeals.firstWhere(
+        (m) => m.name == widget.mealName,
+        orElse: () => const MealExampleForDinner(
+          name: '',
+          category: '',
+          description: '',
+          nutrition: {},
+          imagePath: '',
+        ),
+      );
+      return cleanNutritionDatadinner(meal.nutrition);
+    }
+
+    return {}; // Default return in case no category matched
+  }
+
   Future<void> addMealToDatabase({
     required String mealType,
     required String mealName,
     required String date,
     required String time,
+    required String imagepath,
+    required Map<String, String> nutrition,
   }) async {
-    /////////////////////////////*********************//////////////////////////
     final baseUrl = ApiConfig.addMeal();
+    final cleanedNutrition = nutrition; // Already cleaned in _getMealNutrition
 
     final response = await http.post(
       baseUrl, // Use baseUrl directly as a String
@@ -151,8 +207,11 @@ class _AddMealPageState extends State<AddMealPage> {
         "mealName": mealName,
         "date": date,
         "time": time,
+        "imagePath": imagepath,
+        "nutrition": cleanedNutrition, 
       }),
     );
+
     print("Status: ${response.statusCode}");
     print("Body: ${response.body}");
 

@@ -449,6 +449,7 @@ class _FoodInfoDetailsViewState1 extends State<FoodInfoDetailsView1> {
                                                 widget.dObj["name"].toString(),
                                             mealType: widget.mObj["name"]
                                                 .toString(),
+                                                  imagepath: widget.dObj["b_image"].toString(),
                                           )));
                             }),
                       ),

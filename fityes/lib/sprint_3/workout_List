@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../api_config.dart';
+import '../user_session.dart';
+class WorkoutListPage extends StatefulWidget {
+  final String workoutType;
+
+  const WorkoutListPage({super.key, required this.workoutType});
+
+  @override
+  _WorkoutListPageState createState() => _WorkoutListPageState();
+}
+
+class _WorkoutListPageState extends State<WorkoutListPage> {
+  List<dynamic> workouts = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchWorkouts();
+  }
+
+  Future<void> fetchWorkouts() async {
+       final baseUrl = ApiConfig.getWorkoutByType(widget.workoutType);
+
+    try {
+      final response = await http.get(baseUrl);
+      if (response.statusCode == 200) {
+        setState(() {
+          workouts = json.decode(response.body);
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Erreur lors du chargement');
+      }
+    } catch (e) {
+      print('Erreur: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.workoutType} Workouts'),
+        backgroundColor: Colors.blue[800],
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : workouts.isEmpty
+              ? const Center(child: Text('Aucun workout trouvé.'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: workouts.length,
+                  itemBuilder: (context, index) {
+                    final workout = workouts[index];
+                    return Card(
+                      elevation: 3,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: ListTile(
+                        leading: const Icon(Icons.fitness_center, color: Colors.blue),
+                        title: Text(workout['nameOfWorkout'] ?? 'Workout'),
+                        subtitle: Text(workout['description'] ?? ''),
+                      ),
+                    );
+                  },
+                ),
+    );
+  }
+}

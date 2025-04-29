@@ -220,3 +220,9 @@ final Map<String, List<MealExampleForDinner>> dinnerCategoryMeals = {
 List<MealExampleForDinner> getMealsByCategoryForDinner(String category) {
   return dinnerCategoryMeals[category] ?? [];
 }
+Map<String, String> cleanNutritionDatadinner(Map<String, String> nutrition) {
+  return nutrition.map((key, value) {
+    final cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
+    return MapEntry(key, cleaned.isNotEmpty ? cleaned : '0');
+  });
+}

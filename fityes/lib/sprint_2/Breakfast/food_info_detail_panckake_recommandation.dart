@@ -447,8 +447,10 @@ class _FoodInfoDetailsViewStateREC1 extends State<FoodInfoDetailsViewREC1> {
                                       builder: (context) => AddMealPage(
                                             mealName:
                                                 widget.dObj["name"].toString(),
-                                            mealType: widget.mObj["name"]
-                                                .toString(),
+                                            mealType: widget.mObj["name"].toString(),
+                                            imagepath: widget.dObj["b_image"].toString(),
+                                          
+                                             //   imagepath : widget.dObj["b_image"].toString(),
                                             
                                           )));
                             }),

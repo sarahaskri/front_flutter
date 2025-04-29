@@ -138,6 +138,7 @@ class CategoryMealListDinner extends StatelessWidget {
                         builder: (_) => AddMealPage(
                           mealType: mObj['name'],
                           mealName: meal.name,
+                         imagepath: meal.imagePath,
                         ),
                       ),
                     );

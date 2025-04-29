@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String ip = '192.168.43.151';
+  static const String ip = '192.168.1.12';
   static const String port = '5003';
   static const String basePath = '/api/';
 
@@ -16,8 +16,8 @@ class ApiConfig {
     static Uri  addMealByAdmin() => Uri.parse('${baseUrl}users/addMealByAdmin');
   static Uri  updateMealByAdmin() => Uri.parse('${baseUrl}users/updateMealByAdmin');
   static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');  
-
-  static Uri getMealsByType(String mealType) =>
-    Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
+  static Uri getMealsByType(String mealType) =>Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
+  static Uri addExercise() => Uri.parse('${baseUrl}users/addExercise');
+  static Uri getWorkoutByType(String workoutType) => Uri.parse('${baseUrl}users/getWorkoutByType?nameOfWorkout=$workoutType');
 
 }

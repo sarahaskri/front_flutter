@@ -9,6 +9,7 @@ import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular.dart';
 import 'package:fityes/home.dart';  // Assurez-vous que Home est bien importé
 import 'package:fityes/sprint_2/admin_service.dart';
 import 'package:fityes/sprint_2/mealPlanner.dart';
+import 'package:fityes/sprint_3/workout_planner.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: RegisterPage() ,  
+      home: WorkoutTrackerView() ,  
     
       // Redirige vers la page Home
     );

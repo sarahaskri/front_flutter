@@ -244,6 +244,7 @@ class _FoodInfoDetailsViewStateLunchREC3
                                               widget.dObj["name"].toString(),
                                           mealType:
                                               widget.mObj["name"].toString(),
+                                            imagepath: widget.dObj["b_image"].toString(),
                                         )));
                           },
                         ),

@@ -16,7 +16,7 @@ class MealExampleForLunch {
   });
 }
 
-final Map<String, List<MealExampleForLunch>> categoryMeals = {
+final Map<String, List<MealExampleForLunch>> lunchcategoryMeals = {
   'Salad': [
     const MealExampleForLunch(
       name: 'Fruit Salad',
@@ -223,5 +223,11 @@ final Map<String, List<MealExampleForLunch>> categoryMeals = {
 };
 
 List<MealExampleForLunch> getMealsByCategoryforLunch(String category) {
-  return categoryMeals[category] ?? [];
+  return lunchcategoryMeals[category] ?? [];
+}
+Map<String, String> cleanNutritionDatalunch(Map<String, String> nutrition) {
+  return nutrition.map((key, value) {
+    final cleaned = value.replaceAll(RegExp(r'[^0-9]'), '');
+    return MapEntry(key, cleaned.isNotEmpty ? cleaned : '0');
+  });
 }

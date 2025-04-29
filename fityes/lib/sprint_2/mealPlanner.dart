@@ -312,9 +312,18 @@ Widget buildTodayMeals(String mealType, String userId) {
             ...meals.map((meal) {
               final name = meal['mealName'] ?? 'Nom inconnu';
               final time = meal['time'] ?? 'Heure inconnue';
+              final imagePath = meal['imagePath'];
+
               return ListTile(
-                leading: const Icon(Icons.fastfood),
-                title: Text(" $name"),
+                leading: imagePath != null
+                    ? Image.asset(
+                        imagePath,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(Icons.fastfood),
+                title: Text(name),
                 subtitle: Text("Heure: $time"),
               );
             }).toList(),
@@ -324,6 +333,7 @@ Widget buildTodayMeals(String mealType, String userId) {
     },
   );
 }
+
 
 class MealCategoryCard extends StatelessWidget {
   final String title;

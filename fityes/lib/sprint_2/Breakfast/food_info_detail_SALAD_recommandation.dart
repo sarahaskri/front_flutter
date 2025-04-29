@@ -222,6 +222,7 @@ class _FoodInfoDetailsViewStateREC3 extends State<FoodInfoDetailsViewREC3> {
                                 builder: (context) => AddMealPage(
                                   mealName: widget.dObj["name"].toString(),
                                   mealType: widget.mObj["name"].toString(),
+                                    imagepath: widget.dObj["b_image"].toString(),
                                 ),
                               ),
                             );

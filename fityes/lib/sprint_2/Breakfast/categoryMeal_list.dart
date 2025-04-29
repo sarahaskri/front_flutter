@@ -1,4 +1,5 @@
 import 'package:fityes/sprint_2/Breakfast/mealCategory.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fityes/sprint_2/addMeal.dart';
 import 'mealCategory.dart'; // <-- Import du fichier ci‑dessus
@@ -137,6 +138,7 @@ class CategoryMealList extends StatelessWidget {
                         builder: (_) => AddMealPage(
                           mealType: mObj['name'],
                           mealName: meal.name,
+                          imagepath: meal.imagePath,
                         ),
                       ),
                     );
