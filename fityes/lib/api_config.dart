@@ -18,6 +18,7 @@ class ApiConfig {
   static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');  
   static Uri getMealsByType(String mealType) =>Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
   static Uri addExercise() => Uri.parse('${baseUrl}users/addExercise');
-  static Uri getWorkoutByType(String workoutType) => Uri.parse('${baseUrl}users/getWorkoutByType?nameOfWorkout=$workoutType');
+  static Uri getWorkoutsByType(String workoutType) =>  Uri.parse('${baseUrl}users/getWorkoutsByType?Workout=${Uri.encodeComponent(workoutType)}');
+
 
 }

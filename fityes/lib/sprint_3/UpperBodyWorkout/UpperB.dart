@@ -376,7 +376,6 @@ class _UpperBWState extends State<UpperBW> {
                               const SizedBox(width: 10),
                               _buildItem("assets/images/bench-press.png",
                                   "Bench Press"),
-            
                               const SizedBox(width: 10),
                               _buildItem("assets/images/plastic-bottle.png",
                                   "Bottle of Water"),
@@ -385,115 +384,120 @@ class _UpperBWState extends State<UpperBW> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: ListView(
+                          child: ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Exercises",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "3 Sets",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              ...upperBodyWorkoutSets.map((set) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      set["setName"],
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
+                            itemCount: upperBodyWorkoutSets.length,
+                            itemBuilder: (context, setIndex) {
+                              final set = upperBodyWorkoutSets[setIndex];
+                              return Card(
+                                elevation: 5,
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Set Name
+                                      Text(
+                                        set["setName"],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    ...set["exercises"].map<Widget>((exercise) {
-                                      return Column(
-                                        children: [
-                                          ListTile(
-                                            contentPadding: EdgeInsets.zero,
-                                            leading: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Image.asset(
-                                                exercise["image"],
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            title: Text(
-                                              exercise["name"],
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              exercise["info"],
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            trailing: const Icon(
-                                                Icons.arrow_forward_ios_rounded,
-                                                size: 16),
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ExerciseDetailPage(
-                                                    exerciseData: {
-                                                      "name": exercise["name"],
-                                                      "image":
-                                                          exercise["image"],
-                                                      "level":
-                                                          selectedDifficulty,
-                                                      "calories": exercise[
-                                                          "calories${selectedDifficulty}"],
-                                                      "description": exercise[
-                                                          "description"],
-                                                      "steps":
-                                                          exercise["steps"],
-                                                      "workoutName": widget
-                                                          .mObj["name"],
-                                                      "info": exercise[
-                                                          "info"],
-                                                      
-                                                    },
-                                                  ),
+                                      const SizedBox(height: 10),
+
+                                      // List of Exercises in the Set
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: set["exercises"].length,
+                                        itemBuilder: (context, exerciseIndex) {
+                                          final exercise =
+                                              set["exercises"][exerciseIndex];
+                                          return Card(
+                                            elevation: 3,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: ListTile(
+                                              contentPadding:
+                                                  const EdgeInsets.all(16),
+                                              leading: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  exercise["image"],
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
                                                 ),
-                                              );
-                                            },
-                                          ),
-                                          const Divider(height: 1),
-                                        ],
-                                      );
-                                    }).toList(),
-                                    const SizedBox(height: 20),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
+                                              ),
+                                              title: Text(
+                                                exercise["name"],
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              subtitle: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(exercise["info"]),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    'Calories: ${exercise["calories${selectedDifficulty}"]} kcal',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.grey[600]),
+                                                  ),
+                                                ],
+                                              ),
+                                              trailing: const Icon(Icons
+                                                  .arrow_forward_ios_rounded),
+                                              onTap: () {
+                                                // Navigate to ExerciseDetailPage
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ExerciseDetailPage(
+                                                      exerciseData: {
+                                                        "name":
+                                                            exercise["name"],
+                                                        "image":
+                                                            exercise["image"],
+                                                        "level":
+                                                            selectedDifficulty,
+                                                        "calories": exercise[
+                                                            "calories${selectedDifficulty}"],
+                                                        "description": exercise[
+                                                            "description"],
+                                                        "steps":
+                                                            exercise["steps"],
+                                                        "workoutName":
+                                                            widget.mObj["name"],
+                                                        "info":
+                                                            exercise["info"],
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

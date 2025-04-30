@@ -23,84 +23,89 @@ class _ABworkoutState extends State<ABworkout> {
   String selectedDifficulty = 'Easy';
   String? selectedExerciseImage;
 
-final List<Map<String, dynamic>> abWorkoutSets = [
-  {
-    "setName": "Set 1",
-    "exercises": [
-      {
-        "image": "assets/images/crunches.jpg",
-        "name": "Crunches",
-        "info": "20x",
-        "caloriesEasy": 5,
-        "caloriesMedium": 7,
-        "caloriesHard": 10,
-        "description": "Crunches are an effective exercise that targets the abdominal muscles, specifically the upper abs.",
-        "steps": stepsForCrunches,
-       
-      },
-      {
-        "image": "assets/images/leg_raises.jpg",
-        "name": "Leg Raises",
-        "info": "15x",
-        "caloriesEasy": 6,
-        "caloriesMedium": 8,
-        "caloriesHard": 12,
-        "description": "Leg raises engage the lower abdominal muscles and help build a strong core.",
-        "steps": stepsForLegRaises,
-      },
-    ],
-  },
-  {
-    "setName": "Set 2",
-    "exercises": [
-      {
-        "image": "assets/images/plank.jpg",
-        "name": "Plank",
-        "info": "00:45",
-        "caloriesEasy": 4,
-        "caloriesMedium": 6,
-        "caloriesHard": 8,
-        "description": "The plank is an isometric exercise that works the entire core, including abs, back, and shoulders.",
-       "steps": stepsForPlank,
-      },
-      {
-        "image": "assets/images/bicycle_crunch.jpeg",
-        "name": "Bicycle Crunches",
-        "info": "20x",
-        "caloriesEasy": 7,
-        "caloriesMedium": 9,
-        "caloriesHard": 12,
-        "description": "Bicycle crunches engage both the upper and lower abs while also working the obliques.",
-        "steps": stepsForBicycleCrunch,
-      },
-    ],
-  },
-  {
-    "setName": "Set 3",
-    "exercises": [
-      {
-        "image": "assets/images/mountain_climbers.jpg",
-        "name": "Mountain Climbers",
-        "info": "30 seconds",
-        "caloriesEasy": 6,
-        "caloriesMedium": 8,
-        "caloriesHard": 12,
-        "description": "Mountain climbers are a full-body exercise that also targets the core, specifically the abs.",
-       "steps": stepsForMountainClimbers,
-      },
-      {
-        "image": "assets/images/russian_twists.jpg",
-        "name": "Russian Twists",
-        "info": "20x",
-        "caloriesEasy": 5,
-        "caloriesMedium": 7,
-        "caloriesHard": 10,
-        "description": "Russian twists target the obliques, enhancing core rotation and building strength in the sides of the torso.",
-        "steps" : stepsForRussianTwists,
-      },
-    ],
-  },
-];
+  final List<Map<String, dynamic>> abWorkoutSets = [
+    {
+      "setName": "Set 1",
+      "exercises": [
+        {
+          "image": "assets/images/crunches.jpg",
+          "name": "Crunches",
+          "info": "20x",
+          "caloriesEasy": 5,
+          "caloriesMedium": 7,
+          "caloriesHard": 10,
+          "description":
+              "Crunches are an effective exercise that targets the abdominal muscles, specifically the upper abs.",
+          "steps": stepsForCrunches,
+        },
+        {
+          "image": "assets/images/leg_raises.jpg",
+          "name": "Leg Raises",
+          "info": "15x",
+          "caloriesEasy": 6,
+          "caloriesMedium": 8,
+          "caloriesHard": 12,
+          "description":
+              "Leg raises engage the lower abdominal muscles and help build a strong core.",
+          "steps": stepsForLegRaises,
+        },
+      ],
+    },
+    {
+      "setName": "Set 2",
+      "exercises": [
+        {
+          "image": "assets/images/plank.jpg",
+          "name": "Plank",
+          "info": "00:45",
+          "caloriesEasy": 4,
+          "caloriesMedium": 6,
+          "caloriesHard": 8,
+          "description":
+              "The plank is an isometric exercise that works the entire core, including abs, back, and shoulders.",
+          "steps": stepsForPlank,
+        },
+        {
+          "image": "assets/images/bicycle_crunch.jpeg",
+          "name": "Bicycle Crunches",
+          "info": "20x",
+          "caloriesEasy": 7,
+          "caloriesMedium": 9,
+          "caloriesHard": 12,
+          "description":
+              "Bicycle crunches engage both the upper and lower abs while also working the obliques.",
+          "steps": stepsForBicycleCrunch,
+        },
+      ],
+    },
+    {
+      "setName": "Set 3",
+      "exercises": [
+        {
+          "image": "assets/images/mountain_climbers.jpg",
+          "name": "Mountain Climbers",
+          "info": "30 seconds",
+          "caloriesEasy": 6,
+          "caloriesMedium": 8,
+          "caloriesHard": 12,
+          "description":
+              "Mountain climbers are a full-body exercise that also targets the core, specifically the abs.",
+          "steps": stepsForMountainClimbers,
+        },
+        {
+          "image": "assets/images/russian_twists.jpg",
+          "name": "Russian Twists",
+          "info": "20x",
+          "caloriesEasy": 5,
+          "caloriesMedium": 7,
+          "caloriesHard": 10,
+          "description":
+              "Russian twists target the obliques, enhancing core rotation and building strength in the sides of the torso.",
+          "steps": stepsForRussianTwists,
+        },
+      ],
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -366,10 +371,9 @@ final List<Map<String, dynamic>> abWorkoutSets = [
                               _buildItem(
                                   "assets/images/roll.png", "Foam Roller"),
                               const SizedBox(width: 10),
-                              _buildItem(
-                                  "assets/images/bands.png", "Resistance Bands"),
+                              _buildItem("assets/images/bands.png",
+                                  "Resistance Bands"),
                               const SizedBox(width: 10),
-                           
                               _buildItem("assets/images/plastic-bottle.png",
                                   "Bottle of Water"),
                             ],
@@ -377,114 +381,120 @@ final List<Map<String, dynamic>> abWorkoutSets = [
                         ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: ListView(
+                          child: ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Exercises",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "3 Sets",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              ...abWorkoutSets.map((set) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      set["setName"],
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
+                            itemCount: abWorkoutSets.length,
+                            itemBuilder: (context, setIndex) {
+                              final set = abWorkoutSets[setIndex];
+                              return Card(
+                                elevation: 5,
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Set Name
+                                      Text(
+                                        set["setName"],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    ...set["exercises"].map<Widget>((exercise) {
-                                      return Column(
-                                        children: [
-                                          ListTile(
-                                            contentPadding: EdgeInsets.zero,
-                                            leading: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Image.asset(
-                                                exercise["image"],
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            title: Text(
-                                              exercise["name"],
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              exercise["info"],
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            trailing: const Icon(
-                                                Icons.arrow_forward_ios_rounded,
-                                                size: 16),
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ExerciseDetailPage(
-                                                    exerciseData: {
-                                                      "name": exercise["name"],
-                                                      "image":
-                                                          exercise["image"],
-                                                      "level":
-                                                          selectedDifficulty,
-                                                      "calories": exercise[
-                                                          "calories${selectedDifficulty}"],
-                                                      "description": exercise[
-                                                          "description"],
-                                                      "steps":
-                                                          exercise["steps"],
-                                                             "workoutName": widget
-                                                          .mObj["name"],
-                                                           "info": exercise[
-                                                          "info"],
-                                                    },
-                                                  ),
+                                      const SizedBox(height: 10),
+
+                                      // List of Exercises in the Set
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: set["exercises"].length,
+                                        itemBuilder: (context, exerciseIndex) {
+                                          final exercise =
+                                              set["exercises"][exerciseIndex];
+                                          return Card(
+                                            elevation: 3,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: ListTile(
+                                              contentPadding:
+                                                  const EdgeInsets.all(16),
+                                              leading: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  exercise["image"],
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
                                                 ),
-                                              );
-                                            },
-                                          ),
-                                          const Divider(height: 1),
-                                        ],
-                                      );
-                                    }).toList(),
-                                    const SizedBox(height: 20),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
+                                              ),
+                                              title: Text(
+                                                exercise["name"],
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              subtitle: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(exercise["info"]),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    'Calories: ${exercise["calories${selectedDifficulty}"]} kcal',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.grey[600]),
+                                                  ),
+                                                ],
+                                              ),
+                                              trailing: const Icon(Icons
+                                                  .arrow_forward_ios_rounded),
+                                              onTap: () {
+                                                // Navigate to ExerciseDetailPage
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ExerciseDetailPage(
+                                                      exerciseData: {
+                                                        "name":
+                                                            exercise["name"],
+                                                        "image":
+                                                            exercise["image"],
+                                                        "level":
+                                                            selectedDifficulty,
+                                                        "calories": exercise[
+                                                            "calories${selectedDifficulty}"],
+                                                        "description": exercise[
+                                                            "description"],
+                                                        "steps":
+                                                            exercise["steps"],
+                                                        "workoutName":
+                                                            widget.mObj["name"],
+                                                        "info":
+                                                            exercise["info"],
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

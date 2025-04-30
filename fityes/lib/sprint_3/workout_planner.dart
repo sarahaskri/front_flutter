@@ -126,10 +126,26 @@ class _WorkoutScheduleState extends State<WorkoutSchedule> {
                   ));
               }),
                 
-              _buildWorkoutItem('Upperbody Workout', "assets/images/UBW.png"),
+              _buildWorkoutItem('Upperbody Workout', "assets/images/UBW.png" , ontap: (){Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkoutListPage(workoutType: 'Upperbody Workout'),
+                  ));}, ),
               if (showAllWorkouts) ...[
-                _buildWorkoutItem('Lowerbody Workout', "assets/images/LBW.png"),
-                _buildWorkoutItem('AB Workout', "assets/images/ABW.png"),
+                _buildWorkoutItem('Lowerbody Workout', "assets/images/LBW.png", ontap: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkoutListPage(workoutType: 'Lowerbody Workout'),
+                  ));
+                }),
+                _buildWorkoutItem('AB Workout', "assets/images/ABW.png", ontap: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkoutListPage(workoutType: 'AB Workout'),
+                  ));
+                },),
               ],
              
               

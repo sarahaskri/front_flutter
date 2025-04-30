@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../api_config.dart';
 import '../user_session.dart';
+
 class WorkoutListPage extends StatefulWidget {
   final String workoutType;
 
@@ -14,7 +15,36 @@ class WorkoutListPage extends StatefulWidget {
 
 class _WorkoutListPageState extends State<WorkoutListPage> {
   List<dynamic> workouts = [];
-  bool isLoading = false;
+  bool isLoading = true;
+  String errorMessage = '';
+
+  Future<void> fetchWorkouts() async {
+
+  
+final url = ApiConfig.getWorkoutsByType(widget.workoutType);
+print(url.toString());
+    try {
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          workouts = data;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Erreur serveur: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Erreur de connexion: ${e.toString()}';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -22,54 +52,74 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
     fetchWorkouts();
   }
 
-  Future<void> fetchWorkouts() async {
-       final baseUrl = ApiConfig.getWorkoutByType(widget.workoutType);
-
-    try {
-      final response = await http.get(baseUrl);
-      if (response.statusCode == 200) {
-        setState(() {
-          workouts = json.decode(response.body);
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Erreur lors du chargement');
-      }
-    } catch (e) {
-      print('Erreur: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.workoutType} Workouts'),
+        title: Text('${widget.workoutType} Exercises'),
         backgroundColor: Colors.blue[800],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : workouts.isEmpty
-              ? const Center(child: Text('Aucun workout trouvé.'))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: workouts.length,
-                  itemBuilder: (context, index) {
-                    final workout = workouts[index];
-                    return Card(
-                      elevation: 3,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: const Icon(Icons.fitness_center, color: Colors.blue),
-                        title: Text(workout['nameOfWorkout'] ?? 'Workout'),
-                        subtitle: Text(workout['description'] ?? ''),
-                      ),
-                    );
-                  },
+      body: _buildBodyContent(),
+    );
+  }
+
+  Widget _buildBodyContent() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (errorMessage.isNotEmpty) {
+      return Center(child: Text(errorMessage));
+    }
+    
+    if (workouts.isEmpty) {
+      return const Center(child: Text('Aucun exercice trouvé.'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: workouts.length,
+      itemBuilder: (context, index) {
+        final exercise = workouts[index];
+        return Card(
+          elevation: 5,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: exercise['image'] != null 
+                ? Image.asset(
+                    exercise['image'],
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  )
+                : const Icon(Icons.fitness_center, size: 40),
+            title: Text(
+              exercise['nameOfExercise'] ?? 'Exercice sans nom',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(exercise['info'] ?? ''),
+                const SizedBox(height: 5),
+               Text( 'Date: ${exercise['date']}'  ),
+                         const SizedBox(height: 5),
+                    Text( 'Heure: ${exercise['time']}' ),
+                const SizedBox(height: 5),
+                Text(
+                  'Difficulté: ${exercise['selectedDifficulty'] ?? 'Non spécifiée'}',
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
+              ],
+            ),
+            trailing: Text(
+              '${exercise['burnedCalories']?.toString() ?? 'N/A'} kcal',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        );
+      },
     );
   }
 }
