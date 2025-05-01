@@ -7,18 +7,22 @@ class ApiConfig {
 
   //endpoint
   static Uri register() => Uri.parse('${baseUrl}users/register');
-    static Uri googleSignIn() => Uri.parse('${baseUrl}users/GoogleSignIn');
-    static Uri addMeal() => Uri.parse('${baseUrl}users/addMeal');
+  static Uri googleSignIn() => Uri.parse('${baseUrl}users/GoogleSignIn');
+  static Uri addMeal() => Uri.parse('${baseUrl}users/addMeal');
   static Uri login() => Uri.parse('${baseUrl}users/login');
   static Uri  addProfileInformation() => Uri.parse('${baseUrl}users/addProfileInformation');
-   static Uri  todayMeal() => Uri.parse('${baseUrl}users/todayMeal');
-   static Uri  getAllMealsByAdmin() => Uri.parse('${baseUrl}users/getAllMealsByAdmin');
-    static Uri  addMealByAdmin() => Uri.parse('${baseUrl}users/addMealByAdmin');
+  static Uri  todayMeal() => Uri.parse('${baseUrl}users/todayMeal');
+  static Uri  getAllMealsByAdmin() => Uri.parse('${baseUrl}users/getAllMealsByAdmin');
+  static Uri  addMealByAdmin() => Uri.parse('${baseUrl}users/addMealByAdmin');
   static Uri  updateMealByAdmin() => Uri.parse('${baseUrl}users/updateMealByAdmin');
   static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');  
   static Uri getMealsByType(String mealType) =>Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
   static Uri addExercise() => Uri.parse('${baseUrl}users/addExercise');
   static Uri getWorkoutsByType(String workoutType) =>  Uri.parse('${baseUrl}users/getWorkoutsByType?Workout=${Uri.encodeComponent(workoutType)}');
+  static Uri deletedWorkout(String id) => Uri.parse('${baseUrl}users/deletedWorkout/$id');
+  static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
+  static Uri testnotification() => Uri.parse('${baseUrl}testnotification'); // Supprimez 'users/' si non nécessaire
+
 
 
 }

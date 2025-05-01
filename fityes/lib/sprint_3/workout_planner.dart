@@ -129,7 +129,7 @@ class _WorkoutScheduleState extends State<WorkoutSchedule> {
               _buildWorkoutItem('Upperbody Workout', "assets/images/UBW.png" , ontap: (){Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => WorkoutListPage(workoutType: 'Upperbody Workout'),
+                    builder: (context) =>  WorkoutListPage(workoutType: 'Upperbody Workout'),
                   ));}, ),
               if (showAllWorkouts) ...[
                 _buildWorkoutItem('Lowerbody Workout', "assets/images/LBW.png", ontap: () {
