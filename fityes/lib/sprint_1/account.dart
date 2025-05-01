@@ -23,7 +23,7 @@ class RegisterPage extends StatefulWidget {
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
-}
+}    
 
 class _RegisterPageState extends State<RegisterPage> {
   final _auth = AuthService();
@@ -71,6 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         UserSession.userIdN = responseData['_id'];
         print("ID enregistré dans page account: ${UserSession.userIdN}");
+       
         UserSession.setUserIdN(responseData['_id']);
         
         SharedPreferences prefs = await SharedPreferences.getInstance();
