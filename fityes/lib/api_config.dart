@@ -2,7 +2,8 @@ class ApiConfig {
   static const String ip = '192.168.1.12';
   static const String port = '5003';
   static const String basePath = '/api/';
-
+  static const String basePathNotification = '/apinot/';
+  static String get baseUrlNotification => 'http://$ip:$port$basePathNotification';
   static String get baseUrl => 'http://$ip:$port$basePath';
 
   //endpoint
@@ -21,7 +22,7 @@ class ApiConfig {
   static Uri getWorkoutsByType(String workoutType) =>  Uri.parse('${baseUrl}users/getWorkoutsByType?Workout=${Uri.encodeComponent(workoutType)}');
   static Uri deletedWorkout(String id) => Uri.parse('${baseUrl}users/deletedWorkout/$id');
   static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
-  static Uri testnotification() => Uri.parse('${baseUrl}testnotification'); // Supprimez 'users/' si non nécessaire
+  static Uri sendNotification() => Uri.parse('${baseUrlNotification}sendNotification'); 
 
 
 

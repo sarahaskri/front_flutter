@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
         print(
             "Connexion réussie - ID: ${UserSession.userIdN}, Role: ${UserRole.role}");
   /////////test notification///////
-       // await checkWorkoutAndNotify(); // 
+        await checkWorkoutAndNotify(); // 
         // Navigation en fonction du rôle
         if (user['role'] == 'admin') {
           Navigator.pushReplacement(
@@ -134,7 +134,7 @@ Future<void> checkWorkoutAndNotify() async {
   if (userId != null && fcmToken != null) {
     try {
       final response = await http.post(
-        ApiConfig.checkWorkouts(),
+        ApiConfig.sendNotification(), // Nouveau endpoint
         body: json.encode({
           'userId': userId,
           'fcmToken': fcmToken
@@ -144,9 +144,9 @@ Future<void> checkWorkoutAndNotify() async {
 
       final data = json.decode(response.body);
       if (data['success'] == true && data['workoutsCount'] > 0) {
-        print('Notification envoyée avec succès');
+        print('Notification envoyée: ${data['message']}');
       } else {
-        print('Aucun exercice aujourd\'hui');
+        print('Aucun exercice: ${data['message']}');
       }
     } catch (e) {
       print('Erreur notification: $e');
