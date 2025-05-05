@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String ip = '192.168.1.12';
+  static const String ip = '192.168.1.46';
   static const String port = '5003';
   static const String basePath = '/api/';
   static const String basePathNotification = '/apinot/';
@@ -23,7 +23,6 @@ class ApiConfig {
   static Uri deletedWorkout(String id) => Uri.parse('${baseUrl}users/deletedWorkout/$id');
   static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
   static Uri sendNotification() => Uri.parse('${baseUrlNotification}sendNotification'); 
-
-
+  static Uri calculate_goal() => Uri.parse('${baseUrl}users/calculate_goal');
 
 }
