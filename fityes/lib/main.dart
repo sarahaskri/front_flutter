@@ -25,7 +25,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Assure que Flutter est bien initialisé
-  await Firebase.initializeApp(); // Initialisation de Firebase
+  await Firebase.initializeApp(
+   ); // Initialisation de Firebase
   FirebaseMessaging.instance.getToken().then((value) {
     print("Firebase Token: $value");
   });
@@ -99,7 +100,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: GoalPage(),
+      home:LoginPage(),
       navigatorKey: navigatorKey,
       routes: {
     

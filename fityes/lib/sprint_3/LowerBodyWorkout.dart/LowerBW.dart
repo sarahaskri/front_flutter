@@ -57,7 +57,7 @@ class _LowerBWorkoutState extends State<LowerBWorkout> {
         {
           "image": "assets/images/wall_sit.jpg",
           "name": "Wall Sit",
-          "info": "00:30",
+          "info": "12x",
           "caloriesEasy": 5,
           "caloriesMedium": 6,
           "caloriesHard": 8,

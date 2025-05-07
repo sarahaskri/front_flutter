@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:fityes/dashboardHome.dart';
 import 'package:fityes/principal_dash.dart';
+import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -84,15 +86,17 @@ class _LoginPageState extends State<LoginPage> {
           _showErrorDialog("ID utilisateur introuvable dans la réponse.");
           return;
         }
-
         // Sauvegarde des données
         await UserSession.setUserIdN(user['_id']);
         await UserRole.setRole(user['role']);
 
         print(
             "Connexion réussie - ID: ${UserSession.userIdN}, Role: ${UserRole.role}");
-  /////////test notification///////
-        await checkWorkoutAndNotify(); // 
+        ///////////////
+        ///  Future<void> _loadUserId() async
+
+        /////////test notification///////
+        await checkWorkoutAndNotify(); //
         // Navigation en fonction du rôle
         if (user['role'] == 'admin') {
           Navigator.pushReplacement(
@@ -103,11 +107,30 @@ class _LoginPageState extends State<LoginPage> {
           );
           return; // Ajout d'un return pour éviter d'exécuter le code suivant
         } else if (user['role'] == 'adherent') {
+          final userId = UserSession.userIdN;
+          print('userId dans login : $userId');
+          String? userGoal;
+          try {
+            final goalResponse = await http.get(
+              Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+            );
+
+            if (goalResponse.statusCode == 200) {
+              final goalData = json.decode(goalResponse.body);
+              userGoal = goalData['goal'];
+            } else {
+              print('Goal introuvable');
+              userGoal = "unknown";
+            }
+          } catch (e) {
+            print('Erreur lors de la récupération du goal: $e');
+            userGoal = "unknown";
+          }
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    const Home()), // Remplacez par la page adhérent si nécessaire
+                builder: (context) => DashboardHome(
+                    goal: userGoal ?? 'unknown')), // Replace 'defaultGoal' with the appropriate value or variable
           );
           return; // Ajout d'un return pour éviter d'exécuter le code suivant
         } else {
@@ -126,33 +149,31 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-Future<void> checkWorkoutAndNotify() async {
-  await UserSession.loadUserId();
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  final userId = UserSession.userIdN;
+  Future<void> checkWorkoutAndNotify() async {
+    await UserSession.loadUserId();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    final userId = UserSession.userIdN;
 
-  if (userId != null && fcmToken != null) {
-    try {
-      final response = await http.post(
-        ApiConfig.sendNotification(), // Nouveau endpoint
-        body: json.encode({
-          'userId': userId,
-          'fcmToken': fcmToken
-        }),
-        headers: {'Content-Type': 'application/json'},
-      );
+    if (userId != null && fcmToken != null) {
+      try {
+        final response = await http.post(
+          ApiConfig.sendNotification(), // Nouveau endpoint
+          body: json.encode({'userId': userId, 'fcmToken': fcmToken}),
+          headers: {'Content-Type': 'application/json'},
+        );
 
-      final data = json.decode(response.body);
-      if (data['success'] == true && data['workoutsCount'] > 0) {
-        print('Notification envoyée: ${data['message']}');
-      } else {
-        print('Aucun exercice: ${data['message']}');
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['workoutsCount'] > 0) {
+          print('Notification envoyée: ${data['message']}');
+        } else {
+          print('Aucun exercice: ${data['message']}');
+        }
+      } catch (e) {
+        print('Erreur notification: $e');
       }
-    } catch (e) {
-      print('Erreur notification: $e');
     }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

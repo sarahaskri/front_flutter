@@ -83,7 +83,7 @@ class _FullWorkoutState extends State<FullWorkout> {
         {
           "image": "assets/images/arm_raises.jpg",
           "name": "Arm Raises",
-          "info": "00:53",
+          "info": "20x",
           "caloriesEasy": 3,
           "caloriesMedium": 4,
           "caloriesHard": 5,

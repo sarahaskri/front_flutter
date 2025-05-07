@@ -34,20 +34,25 @@ class _DashboardHome extends State<DashboardHome> {
       print("userId dans dashboard client : $userId");
     });
 
-    if (userId != null) {
-      calculateGoal(userId!, widget.goal);
-    } else {
-      print("Erreur: userId est null");
-    }
+    String? userGoal;
+          try {
+            final goalResponse = await http.get(
+              Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+            );
+
+            if (goalResponse.statusCode == 200) {
+              final goalData = json.decode(goalResponse.body);
+              userGoal = goalData['goal'];
+            } else {
+              print('Goal introuvable');
+              userGoal = "unknown";
+            }
+          } catch (e) {
+            print('Erreur lors de la récupération du goal: $e');
+            userGoal = "unknown";
+          }
   }
   
-    List<String> _titles = [
-    'Home',
-    'Meals',
-    'Workouts',
-    'Progression',
-    'Profile',
-  ];
 
   late List<Widget> _screens;
 

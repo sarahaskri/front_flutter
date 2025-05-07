@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '709810362183',
     projectId: 'pushnotofaction',
     storageBucket: 'pushnotofaction.firebasestorage.app',
+    iosClientId: '709810362183-82qega714301f205c0rgfc3ru6cafeg6.apps.googleusercontent.com',
     iosBundleId: 'com.example.fityes',
   );
 
@@ -72,6 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '709810362183',
     projectId: 'pushnotofaction',
     storageBucket: 'pushnotofaction.firebasestorage.app',
+    iosClientId: '709810362183-82qega714301f205c0rgfc3ru6cafeg6.apps.googleusercontent.com',
     iosBundleId: 'com.example.fityes',
   );
 
@@ -83,4 +85,5 @@ class DefaultFirebaseOptions {
     authDomain: 'pushnotofaction.firebaseapp.com',
     storageBucket: 'pushnotofaction.firebasestorage.app',
   );
+
 }

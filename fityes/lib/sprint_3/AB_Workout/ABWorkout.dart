@@ -57,7 +57,7 @@ class _ABworkoutState extends State<ABworkout> {
         {
           "image": "assets/images/plank.jpg",
           "name": "Plank",
-          "info": "00:45",
+          "info": "16x",
           "caloriesEasy": 4,
           "caloriesMedium": 6,
           "caloriesHard": 8,
@@ -84,7 +84,7 @@ class _ABworkoutState extends State<ABworkout> {
         {
           "image": "assets/images/mountain_climbers.jpg",
           "name": "Mountain Climbers",
-          "info": "30 seconds",
+          "info": "15x",
           "caloriesEasy": 6,
           "caloriesMedium": 8,
           "caloriesHard": 12,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:fityes/home.dart';
+import 'package:fityes/sprint_1/goal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fityes/api_config.dart'; 
@@ -47,7 +48,7 @@ print(response.body);
 
       if (responseData['message'] == 'Informations mises à jour avec succès') {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Home()),
+          MaterialPageRoute(builder: (context) =>  GoalPage()),
         );
         print('Navigation vers Home.dart exécutée');
 

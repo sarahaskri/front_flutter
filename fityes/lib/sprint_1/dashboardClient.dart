@@ -83,6 +83,7 @@ class _Dashboardclient extends State<Dashboardclient> {
       final data = jsonDecode(response.body);
       print('IMC: ${data['imc']}');
       print('Message: ${data['message']}');
+      print('goal est :${data['goal']}');
     } else {
       print('Erreur: ${response.body}');
     }
