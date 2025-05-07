@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import nécessaire pour initialiser Firebase
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fityes/sprint_1/dashboardClient.dart';
@@ -85,6 +86,7 @@ void main() async {
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  FirebaseAuth.instance.setLanguageCode("fr");
   print("_firebaseMessagingBackgroundHandler: $message");
 }
 

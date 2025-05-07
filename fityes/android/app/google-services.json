@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:709810362183:android:1195ca415f14acca309e62",
+        "mobilesdk_app_id": "1:709810362183:android:5f0341c3e3123ace309e62",
         "android_client_info": {
-          "package_name": "com.example.fityes"
+          "package_name": "com.example.fityesNV"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "709810362183-9g11t5tnolcu9jip24r04ghbneaf4150.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fityesNV",
+            "certificate_hash": "add5b019e8a47fd2a772142ede25f897f103ff50"
+          }
+        },
         {
           "client_id": "709810362183-pddouvb2enfn6jje8vivva3ds39688f0.apps.googleusercontent.com",
           "client_type": 3

@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String ip = '192.168.43.151';
+  static const String ip = '192.168.1.46';
   static const String port = '5003';
   static const String basePath = '/api/';
   static const String basePathNotification = '/apinot/';
@@ -27,6 +27,8 @@ static Uri getWorkoutsByType(String workoutType, String userId) =>
   static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
   static Uri sendNotification() => Uri.parse('${baseUrlNotification}sendNotification'); 
   static Uri calculate_goal() => Uri.parse('${baseUrl}users/calculate_goal');
+  
+ static Uri addGoogleUser() => Uri.parse('${baseUrl}users/addGoogleUser');
     //static Uri getGoal(String userId) => Uri.parse('${baseUrl}/goal/$userId');
 
 }

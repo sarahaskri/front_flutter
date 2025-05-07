@@ -23,7 +23,7 @@ class RegisterPage extends StatefulWidget {
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
-}    
+}
 
 class _RegisterPageState extends State<RegisterPage> {
   final _auth = AuthService();
@@ -71,9 +71,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
         UserSession.userIdN = responseData['_id'];
         print("ID enregistré dans page account: ${UserSession.userIdN}");
-       
+
         UserSession.setUserIdN(responseData['_id']);
-        
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userEmail', _emailController.text);
 
@@ -178,10 +178,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildSocialButton("assets/images/google.png", () async {
-                    UserCredential? userCredential =
-                        await _auth.loginWithGoogle(context);
-                    if (userCredential != null) {
-                      final email = userCredential.user?.email;
+                    bool success = await _auth.loginWithGoogle(context);
+                    if (success) {
+                      final email = FirebaseAuth.instance.currentUser?.email;
                       if (email != null && mounted) {
                         Navigator.pushReplacement(
                           context,
@@ -193,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content:
-                                Text('Échec de la connexion avec Google.')),
+                                Text('Connexion Google échouée ou refusée.')),
                       );
                     }
                   }),
@@ -288,56 +287,69 @@ class _RegisterPageState extends State<RegisterPage> {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<UserCredential?> loginWithGoogle(BuildContext context) async {
+  Future<bool> loginWithGoogle(BuildContext context) async {
     try {
-      // Déconnexion de Google pour éviter les anciennes sessions
       await GoogleSignIn().signOut();
 
-      // Tentative de connexion avec Google
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null)
-        return null; // Si l'utilisateur annule la connexion, retourne null
+      if (googleUser == null) return false;
 
-      // Authentification avec Google
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Connexion avec Firebase
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
 
       if (user != null) {
-        // Récupération des informations utilisateur
         final email = user.email ?? "";
         final fullName = user.displayName ?? "";
         final uid = user.uid;
 
-        // Séparation du nom complet en prénom et nom de famille
         final nameParts = fullName.split(" ");
         final firstName = nameParts.isNotEmpty ? nameParts[0] : "";
-        final lastName = nameParts.length > 1 ? nameParts[1] : "";
+        final lastName =
+            nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
 
-        // Enregistrement de l'uid dans UserSession.userIdF
         UserSession.userIdF = uid;
-        print("UID enregistré localement : ${UserSession.userIdF}");
+        print("Locally saved UID : ${UserSession.userIdF}");
 
-        // Navigation vers la page de profil après la connexion
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProfilePage(email: email),
-          ),
+        final baseUrl = ApiConfig.addGoogleUser();
+        final response = await http.post(
+          baseUrl,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "uid": uid,
+            "email": email,
+            "firstName": firstName,
+            "lastName": lastName,
+          }),
         );
+
+        print("response of API : ${response.body}");
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          return true;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(' The user already exists')),
+          );
+          return false;
+        }
       }
 
-      return userCredential; // Retourne les informations d'authentification de l'utilisateur
+      return false;
     } catch (e) {
-      print("Erreur Google Sign-In: $e");
-      return null; // En cas d'erreur, retourne null
+      print("Error Google Sign-In: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Error signing in with Google')),
+      );
+      return false;
     }
   }
 }
