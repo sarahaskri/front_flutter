@@ -4,21 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 
-class geminiChatbot extends StatefulWidget {
-  const geminiChatbot({super.key});
+class GeminiChatbot extends StatefulWidget {
+  const GeminiChatbot({super.key});
 
   @override
-  State<geminiChatbot> createState() => _geminiChatbotState();
+  State<GeminiChatbot> createState() => _GeminiChatbotState();
 }
 
-class _geminiChatbotState extends State<geminiChatbot> {
+class _GeminiChatbotState extends State<GeminiChatbot> {
   static const apiKey = 'AIzaSyDNcuYMB4GT-emcvpOdCqO0r1RuqYjTS3Q';
-final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
+  final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
   TextEditingController messageController = TextEditingController();
   final List<modelChatbot> chat = [];
 
   Future<void> sendMessage() async {
     final message = messageController.text;
+
     setState(() {
       messageController.clear();
       chat.add(modelChatbot(
@@ -27,12 +28,14 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
         time: DateTime.now(),
       ));
     });
+
     final content = [Content.text(message)];
     final response = await model.generateContent(content);
-        setState(() {
+
+    setState(() {
       chat.add(modelChatbot(
         isUser: false,
-        message: response.text ??"",
+        message: response.text ?? "",
         time: DateTime.now(),
       ));
     });
@@ -41,28 +44,35 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Gemini Chatbot'),
+        title: const Text('AI ChatBot'),
+        titleTextStyle: const TextStyle(
+          fontSize: 23,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         centerTitle: true,
         elevation: 3,
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFFD8B5FF),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-                child: ListView.builder(
-                    itemCount: chat.length,
-                    itemBuilder: (context, index) {
-                      final message = chat[index];
-                      return userPrompt(
-                        isUser: message.isUser,
-                        message: message.message,
-                        time: message.time,
-                      );
-                    })),
+              child: ListView.builder(
+                itemCount: chat.length,
+                itemBuilder: (context, index) {
+                  final message = chat[index];
+                  return userPrompt(
+                    isUser: message.isUser,
+                    message: message.message,
+                    time: message.time,
+                  );
+                },
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -80,19 +90,19 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
                         hintStyle: const TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Colors.blue),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFD8B5FF),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   GestureDetector(
-                    onTap: () {
-                      sendMessage();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.blue,
-                      child: const Icon(
+                    onTap: sendMessage,
+                    child: const CircleAvatar(
+                      backgroundColor: Color(0xFFD8B5FF),
+                      child: Icon(
                         Icons.send,
                         color: Colors.white,
                       ),
@@ -107,18 +117,19 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
     );
   }
 
-  Container userPrompt(
-      {required final bool isUser,
-      required String message,
-        required DateTime time}) {
-      final formattedTime = DateFormat('HH:mm aa').format(time);
+  Container userPrompt({
+    required final bool isUser,
+    required String message,
+    required DateTime time,
+  }) {
+    final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(time);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(15),
-      margin: EdgeInsets.symmetric(vertical: 15)
+      margin: const EdgeInsets.symmetric(vertical: 15)
           .copyWith(left: isUser ? 15 : 80, right: isUser ? 80 : 15),
       decoration: BoxDecoration(
-        color: isUser ? Colors.blue : Colors.white,
+        color: isUser ? const Color(0xFFD8B5FF) : Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -131,14 +142,12 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
               color: isUser ? Colors.white : Colors.black,
             ),
           ),
-          SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                time.toString(),
+                formattedTime,
                 style: TextStyle(
                   fontSize: 12,
                   color: isUser ? Colors.white : Colors.black,
@@ -151,4 +160,3 @@ final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
     );
   }
 }
- 

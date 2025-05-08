@@ -1,6 +1,6 @@
 import 'dart:convert';
-
 import 'package:fityes/api_config.dart';
+import 'package:fityes/gemini.dart';
 import 'package:fityes/home.dart';
 import 'package:fityes/principal_dash.dart';
 import 'package:fityes/sprint_1/LoginPage.dart';
@@ -24,8 +24,8 @@ class DashboardHome extends StatefulWidget {
 class _DashboardHome extends State<DashboardHome> {
   String? userId;
   int _selectedIndex = 0;
-
-
+  double posX = 20;
+  double posY = 500;
 
   Future<void> _loadUserId() async {
     await UserSession.loadUserId();
@@ -35,24 +35,23 @@ class _DashboardHome extends State<DashboardHome> {
     });
 
     String? userGoal;
-          try {
-            final goalResponse = await http.get(
-              Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
-            );
+    try {
+      final goalResponse = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+      );
 
-            if (goalResponse.statusCode == 200) {
-              final goalData = json.decode(goalResponse.body);
-              userGoal = goalData['goal'];
-            } else {
-              print('Goal introuvable');
-              userGoal = "unknown";
-            }
-          } catch (e) {
-            print('Erreur lors de la récupération du goal: $e');
-            userGoal = "unknown";
-          }
+      if (goalResponse.statusCode == 200) {
+        final goalData = json.decode(goalResponse.body);
+        userGoal = goalData['goal'];
+      } else {
+        print('Goal introuvable');
+        userGoal = "unknown";
+      }
+    } catch (e) {
+      print('Erreur lors de la récupération du goal: $e');
+      userGoal = "unknown";
+    }
   }
-  
 
   late List<Widget> _screens;
 
@@ -69,46 +68,106 @@ class _DashboardHome extends State<DashboardHome> {
       LoginPage(),
     ];
   }
- 
- void _onTappedItem (int index) {
+
+  void _onTappedItem(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.black,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          onTap: _onTappedItem,
-          currentIndex: _selectedIndex,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home", backgroundColor: Color(0xFF7EB6FF),
-            ),
-             BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant),
-              label: "Meals",
-            ),
-             BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center),
-              label: "Workouts",
-            ),
-             BottomNavigationBarItem(
-              icon: Icon(Icons.show_chart),
-              label: "Progression",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile",
+        body: Stack(
+          children: [
+            // Contenu principal
+            _screens[_selectedIndex],
+
+            // Bulle circulaire déplaçable
+            Positioned(
+              left: posX,
+              top: posY,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    posX += details.delta.dx;
+                    posY += details.delta.dy;
+                  });
+                },
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => GeminiChatbot()),
+                  );
+                },
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:  Color(0xFFD8B5FF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.chat_rounded, color: Colors.white),
+                ),
+              ),
             ),
           ],
+        ),
+        bottomNavigationBar: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home, 0),
+              _buildNavItem(Icons.restaurant, 1),
+              _buildNavItem(Icons.fitness_center, 2),
+              _buildNavItem(Icons.show_chart, 3),
+              _buildNavItem(Icons.person, 4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index) {
+    bool isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => _onTappedItem(index),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        width: 60,
+        height: 60,
+        transform: Matrix4.translationValues(0, isSelected ? -20 : 0, 0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isSelected ? const Color(0xFF9fbef7) : Colors.transparent,
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? Colors.white : const Color.fromARGB(255, 186, 186, 186),
+          size: 30,
         ),
       ),
     );

@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import nécessaire pour initialiser Firebase
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:fityes/dashboardHome.dart';
 import 'package:fityes/gemini.dart';
+import 'package:fityes/sprint_1/DataProfile.dart';
 import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:fityes/firebaseNot.dart';
 import 'package:fityes/firebase_options.dart';
@@ -19,6 +21,7 @@ import 'package:fityes/home.dart'; // Assurez-vous que Home est bien importé
 import 'package:fityes/sprint_2/admin_service.dart';
 import 'package:fityes/sprint_2/mealPlanner.dart';
 import 'package:fityes/sprint_3/workout_planner.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -27,8 +30,14 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Assure que Flutter est bien initialisé
-  await Firebase.initializeApp(
-   ); // Initialisation de Firebase
+ if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.web,
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
+
   FirebaseMessaging.instance.getToken().then((value) {
     print("Firebase Token: $value");
   });
@@ -103,7 +112,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:geminiChatbot(),
+      home:DataProfile(),
       navigatorKey: navigatorKey,
       routes: {
     

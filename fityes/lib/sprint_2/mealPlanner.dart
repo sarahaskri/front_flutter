@@ -60,7 +60,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                   Icon(Icons.more_vert),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               // Meal Nutritions
               Row(
@@ -87,7 +87,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
               // Affichage de la fréquence sélectionnée
               //  Text(
               // "Selected Frequency: $selectedFrequency",
@@ -99,35 +99,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
 
               const SizedBox(height: 16),
               const SizedBox(height: 200, child: NutritionChart()),
-
-              const SizedBox(height: 20),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF2FF),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Daily Meal Schedule",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    ElevatedButton(
-                      onPressed: null,
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xFF9fbef7)),
-                      ),
-                      child:
-                          Text("Check", style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

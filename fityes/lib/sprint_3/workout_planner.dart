@@ -63,38 +63,6 @@ class _WorkoutScheduleState extends State<WorkoutSchedule> {
               ),
               const SizedBox(height: 20),
 
-              // Daily Meal Schedule
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF2FF),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Daily Meal Schedule",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF9fbef7),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text(
-                        "Check",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
               // Upcoming Workout
                Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
