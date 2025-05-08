@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
         final responseData = json.decode(response.body);
 
         UserSession.userIdN = responseData['_id'];
-        print("ID enregistré dans page account: ${UserSession.userIdN}");
+        print("ID registered in page account:${UserSession.userIdN}");
 
         UserSession.setUserIdN(responseData['_id']);
 
@@ -78,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
         prefs.setString('userEmail', _emailController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Inscription réussie !')),
+          const SnackBar(content: Text('Successful registration !')),
         );
 
         await Future.delayed(const Duration(seconds: 1));
@@ -97,7 +97,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur de connexion : $e')),
+        SnackBar(content: Text('Connection error : $e')),
       );
     }
   }
@@ -178,7 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildSocialButton("assets/images/google.png", () async {
-                    bool success = await _auth.loginWithGoogle(context);
+                    bool success = await _auth.sign_in_with_google(context);
                     if (success) {
                       final email = FirebaseAuth.instance.currentUser?.email;
                       if (email != null && mounted) {
@@ -192,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content:
-                                Text('Connexion Google échouée ou refusée.')),
+                                Text('Google login failed or refused.')),
                       );
                     }
                   }),
@@ -287,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<bool> loginWithGoogle(BuildContext context) async {
+  Future<bool> sign_in_with_google(BuildContext context) async {
     try {
       await GoogleSignIn().signOut();
 

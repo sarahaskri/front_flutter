@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import nécessaire pour initialiser Firebase
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:fityes/gemini.dart';
 import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:fityes/firebaseNot.dart';
 import 'package:fityes/firebase_options.dart';
@@ -102,7 +103,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:LoginPage(),
+      home:geminiChatbot(),
       navigatorKey: navigatorKey,
       routes: {
     

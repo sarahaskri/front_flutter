@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String ip = '192.168.1.46';
+  static const String ip = '192.168.1.12';
   static const String port = '5003';
   static const String basePath = '/api/';
   static const String basePathNotification = '/apinot/';
@@ -19,16 +19,16 @@ class ApiConfig {
   static Uri  deleteMealByAdmin() => Uri.parse('${baseUrl}users/deleteMealByAdmin');  
   static Uri getMealsByType(String mealType) =>Uri.parse('${baseUrl}users/getMealsByType?mealType=$mealType');
   static Uri addExercise() => Uri.parse('${baseUrl}users/addExercise');
- // static Uri getWorkoutsByType(String workoutType, userId) =>  Uri.parse('${baseUrl}users/getWorkoutsByType?Workout=${Uri.encodeComponent(workoutType,userId)}&userId=$userId');
-static Uri getWorkoutsByType(String workoutType, String userId) => 
+  static Uri getWorkoutsByType(String workoutType, String userId) => 
   Uri.parse('${baseUrl}users/getWorkoutsByType/$userId/$workoutType');
 
   static Uri deletedWorkout(String id) => Uri.parse('${baseUrl}users/deletedWorkout/$id');
   static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
   static Uri sendNotification() => Uri.parse('${baseUrlNotification}sendNotification'); 
   static Uri calculate_goal() => Uri.parse('${baseUrl}users/calculate_goal');
-  
  static Uri addGoogleUser() => Uri.parse('${baseUrl}users/addGoogleUser');
-    //static Uri getGoal(String userId) => Uri.parse('${baseUrl}/goal/$userId');
+ static Uri login_with_google() => Uri.parse('${baseUrl}users/login_with_google');
+
+  //  static Uri getGoal(String userId) => Uri.parse('${baseUrl}/goal/$userId');
 
 }
