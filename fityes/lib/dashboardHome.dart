@@ -3,6 +3,7 @@ import 'package:fityes/api_config.dart';
 import 'package:fityes/gemini.dart';
 import 'package:fityes/home.dart';
 import 'package:fityes/principal_dash.dart';
+import 'package:fityes/sprint_1/DataProfile.dart';
 import 'package:fityes/sprint_1/LoginPage.dart';
 import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:fityes/sprint_2/Breakfast/breakfast_interface.dart';
@@ -65,7 +66,7 @@ class _DashboardHome extends State<DashboardHome> {
       MealPlannerPage(),
       WorkoutTrackerView(),
       Home(),
-      LoginPage(),
+      DataProfile(),
     ];
   }
 

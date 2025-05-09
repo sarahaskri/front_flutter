@@ -1,6 +1,116 @@
+import 'dart:convert';
+import 'package:fityes/api_config.dart';
+import 'package:fityes/sprint_1/editProfile.dart';
 import 'package:flutter/material.dart';
+import 'package:fityes/user_session.dart';
+import 'package:http/http.dart' as http;
 
-class DataProfile extends StatelessWidget {
+class DataProfile extends StatefulWidget {
+  const DataProfile({super.key});
+
+  @override
+  _DataProfileState createState() => _DataProfileState();
+}
+
+class _DataProfileState extends State<DataProfile> {
+  String firstname = '';
+  String lastname = '';
+  String email = '';
+  String password = '';
+  String weight = '';
+  String height = '';
+  String age = '';
+  String goal = 'unknown'; // Initialized as a class field
+
+  bool isLoading = false;
+  String? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserIdAndFetchData();
+  }
+
+  Future<void> _loadUserIdAndFetchData() async {
+    setState(() {
+      isLoading = false;
+    });
+
+    await UserSession.loadUserId();
+    setState(() {
+      userId = UserSession.userIdN ?? UserSession.userIdF;
+      print("userId in DataProfile: $userId");
+    });
+
+    if (userId != null) {
+      await fetchAdherentData();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<Map<String, dynamic>?> getAdherent(String userId) async {
+    final url = ApiConfig.getAdherentById(userId);
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Network error: $e');
+      return null;
+    }
+  }
+
+  Future<void> fetchAdherentData() async {
+    if (userId == null) return;
+
+    final data = await getAdherent(userId!);
+    if (data != null) {
+      setState(() {
+        firstname = data['firstname']?.toString() ?? '';
+        lastname = data['lastname']?.toString() ?? '';
+        email = data['email']?.toString() ?? '';
+        password = data['password']?.toString() ?? '';
+        weight = data['weight']?.toString() ?? '';
+        height = data['height']?.toString() ?? '';
+        age = data['age']?.toString() ?? '';
+      });
+    }
+
+    // Fetch goal separately
+    try {
+      final goalResponse = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+      );
+      if (goalResponse.statusCode == 200) {
+        final goalData = json.decode(goalResponse.body);
+        setState(() {
+          goal = goalData['goal'] ?? 'unknown';
+        });
+      } else {
+        setState(() {
+          goal = 'unknown';
+          print('Goal does not exist');
+        });
+      }
+    } catch (e) {
+      setState(() {
+        goal = 'unknown';
+        print('Error retrieving goal: $e');
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,77 +121,95 @@ class DataProfile extends StatelessWidget {
         titleTextStyle: const TextStyle(
           fontSize: 23,
           fontWeight: FontWeight.bold,
-          color: Color.fromARGB(255, 0, 0, 0),
+          color: Colors.black,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // alignement à gauche
-          children: [
-            const SizedBox(height: 20),
-            const Center(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage('assets/images/beauty.png'),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Jean Dupont',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Column(
+                      children: [
+                        const CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage('assets/images/beauty.png'),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '$firstname $lastname',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Want to edit your profile?',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Color(0xFF9fbef7), size: 30),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfile(
+                                  firstname: firstname,
+                                  lastname: lastname,
+                                  email: email,
+                                  password : password,
+                                  weight: weight,
+                                  height: height,
+                                  age: age,
+                                  goal: goal,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Recomandcard1(title: 'Your goal is', goal: goal),
+                  ),
+                  const SizedBox(height: 20),
+                  AccountCard(
+                    firstname: firstname,
+                    lastname: lastname,
+                    email: email,
+                    password: '......', // Display dots as requested
+                    weight: weight,
+                    height: height,
+                    goal: goal,
+                    age: age,
+                  ),
+                  const SizedBox(height: 10),
+                  const AccountCard2(),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
-
-            // Phrase + icône
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Want to edit your profile?',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Icon(Icons.edit, color:  Color(0xFF9fbef7)
-                      , size: 30),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Card à gauche
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Recomandcard1(title: 'Your goal is', goal: 'gain weight'),
-            ),
-
-         const SizedBox(height: 20),
-
-            // Options de profil
-           AccountCard(),
-           const SizedBox(height: 10),
-
-            AccountCard2(),
-          ],
-        ),
-      ),
     );
   }
-
- 
 }
 
 class Recomandcard1 extends StatelessWidget {
@@ -101,14 +229,13 @@ class Recomandcard1 extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color.fromARGB(255, 189, 210, 255), Color(0xFFf7f8fc)],
+          colors: [Color.fromARGB(255, 189, 210, 255), Color(0xFFf8f8fc)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: Colors.grey.withOpacity(0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -116,7 +243,7 @@ class Recomandcard1 extends StatelessWidget {
         ],
       ),
       child: Row(
-       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
             title,
@@ -140,15 +267,33 @@ class Recomandcard1 extends StatelessWidget {
   }
 }
 
-
 class AccountCard extends StatelessWidget {
+  final String firstname;
+  final String lastname;
+  final String email;
+  final String password;
+  final String weight;
+  final String height;
+  final String age;
+  final String goal;
+
+  const AccountCard({
+    super.key,
+    required this.firstname,
+    required this.lastname,
+    required this.email,
+    required this.password,
+    required this.weight,
+    required this.height,
+    required this.age,
+    required this.goal,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -164,70 +309,61 @@ class AccountCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildOption(Icons.person, ' First Name','firstname'),
-            _buildOption(Icons.person,'Last Name','lastname'),
-            _buildOption(Icons.email, 'Email','email'),
-            _buildOption(Icons.password, ' Password','password'),
-            _buildOption(Icons.fitness_center, 'Weight','weight'), 
-            _buildOption(Icons.straighten, 'Height','height'),
-               _buildOption(Icons.track_changes, 'Goal','goal'),
-            _buildOption(Icons.calendar_month, 'Age','age'),
-            
+            _buildOption(Icons.person, 'First Name', firstname),
+            _buildOption(Icons.person, 'Last Name', lastname),
+            _buildOption(Icons.email, 'Email', email),
+            _buildOption(Icons.lock, 'Password', '......'), // Fixed to display dots
+            _buildOption(Icons.fitness_center, 'Weight', weight),
+            _buildOption(Icons.straighten, 'Height', height),
+            _buildOption(Icons.track_changes, 'Goal', goal),
+            _buildOption(Icons.calendar_month, 'Age', age),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildOption(IconData icon, String title , String subtitle) {
+  Widget _buildOption(IconData icon, String title, String value) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF9fbef7),size: 30,),
+      leading: Icon(icon, color: const Color(0xFF9fbef7), size: 30),
       title: Text(title),
-      subtitle: Text(subtitle),
-   
+      subtitle: Text(value.isEmpty ? 'Not set' : value),
     );
   }
 }
+
 class AccountCard2 extends StatelessWidget {
+  const AccountCard2({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-      
-            _buildOption(Icons.logout, 'Logout', 'logout'),
-              // Action à effectuer lors de l'appui sur le bouton "Logout"
-          
-            _buildOption(Icons.delete, 'Delete account', 'delete_account'),
-            
+            _buildOption(context, Icons.logout, 'Logout'),
+            _buildOption(context, Icons.delete, 'Delete account'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildOption(IconData icon, String title , String subtitle) {
+  Widget _buildOption(BuildContext context, IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: const Color.fromARGB(255, 215, 8, 8),
-      size: 30,),
-      title: Text(title),textColor: Colors.red,
-
-      onTap: () { if (title == 'Logout') {
-          // Action à effectuer lors de l'appui sur le bouton "Logout"
-          // Par exemple, naviguer vers la page de connexion ou supprimer le token d'authentification
+      leading: Icon(icon, color: Colors.red, size: 30),
+      title: Text(title, style: const TextStyle(color: Colors.red)),
+      onTap: () {
+        // TODO: Implement logout and delete account functionality
+        if (title == 'Logout') {
+          // Add logout logic
         } else if (title == 'Delete account') {
-          // Action à effectuer lors de l'appui sur le bouton "Delete account"
-          // Par exemple, afficher une boîte de dialogue de confirmation avant de supprimer le compte
+          // Add delete account logic
         }
-        
       },
     );
   }

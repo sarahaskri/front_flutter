@@ -21,14 +21,16 @@ class ApiConfig {
   static Uri addExercise() => Uri.parse('${baseUrl}users/addExercise');
   static Uri getWorkoutsByType(String workoutType, String userId) => 
   Uri.parse('${baseUrl}users/getWorkoutsByType/$userId/$workoutType');
-
+  
   static Uri deletedWorkout(String id) => Uri.parse('${baseUrl}users/deletedWorkout/$id');
   static Uri checkWorkouts() => Uri.parse('${baseUrl}api/check-workouts');
   static Uri sendNotification() => Uri.parse('${baseUrlNotification}sendNotification'); 
   static Uri calculate_goal() => Uri.parse('${baseUrl}users/calculate_goal');
  static Uri addGoogleUser() => Uri.parse('${baseUrl}users/addGoogleUser');
  static Uri login_with_google() => Uri.parse('${baseUrl}users/login_with_google');
-
+  static Uri getAdherentById(String userId) => Uri.parse('${baseUrl}users/getAdherentById/$userId');
+   static Uri update(String userId) => Uri.parse('${baseUrl}users/update/$userId');
+    static Uri updatePassword(String userId) => Uri.parse('${baseUrl}users/updatePassword/$userId');
   //  static Uri getGoal(String userId) => Uri.parse('${baseUrl}/goal/$userId');
 
 }
