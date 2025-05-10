@@ -216,14 +216,13 @@ class _EditProfileState extends State<EditProfile> {
                             ListTile(
                               leading: const Icon(Icons.lock, color: Color(0xFF9fbef7), size: 30),
                               title: const Text('Password'),
-                              subtitle: const Text('......'),
+                              subtitle: const Text('•••••••••••••••'),
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ChangePasswordPage(
-                                      password: widget.password, // Transmission du mot de passe
-                                    ),
+                                    builder: (context) => const ChangePasswordPage(
+                                                ),
                                   ),
                                 );
                               },

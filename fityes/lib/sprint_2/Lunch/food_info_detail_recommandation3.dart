@@ -28,12 +28,12 @@ class _FoodInfoDetailsViewStateLunchREC3
   List ingredientsArr = [
     {
       "image": "assets/images/wrap.png",
-      "title": "Whole Wheat Wrap",
+      "title": "Wheat Wrap",
       "value": "1"
     },
     {
       "image": "assets/images/veggies.png",
-      "title": "Grilled Vegetables",
+      "title": "Grilled Veg",
       "value": "1 cup"
     },
     {"image": "assets/images/hummus.png", "title": "Hummus", "value": "2 tbsp"},

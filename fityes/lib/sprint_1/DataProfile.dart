@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:fityes/api_config.dart';
+import 'package:fityes/home.dart';
+import 'package:fityes/sprint_1/LoginPage.dart';
 import 'package:fityes/sprint_1/editProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:fityes/user_session.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DataProfile extends StatefulWidget {
   const DataProfile({super.key});
@@ -38,7 +41,7 @@ class _DataProfileState extends State<DataProfile> {
 
     await UserSession.loadUserId();
     setState(() {
-      userId = UserSession.userIdN ?? UserSession.userIdF;
+        userId = UserSession.userIdN ?? UserSession.userIdF;
       print("userId in DataProfile: $userId");
     });
 
@@ -136,7 +139,8 @@ class _DataProfileState extends State<DataProfile> {
                       children: [
                         const CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/images/beauty.png'),
+                          backgroundImage:
+                              AssetImage('assets/images/beauty.png'),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -165,7 +169,8 @@ class _DataProfileState extends State<DataProfile> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Color(0xFF9fbef7), size: 30),
+                          icon: const Icon(Icons.edit,
+                              color: Color(0xFF9fbef7), size: 30),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -174,7 +179,7 @@ class _DataProfileState extends State<DataProfile> {
                                   firstname: firstname,
                                   lastname: lastname,
                                   email: email,
-                                  password : password,
+                                  password: password,
                                   weight: weight,
                                   height: height,
                                   age: age,
@@ -312,7 +317,8 @@ class AccountCard extends StatelessWidget {
             _buildOption(Icons.person, 'First Name', firstname),
             _buildOption(Icons.person, 'Last Name', lastname),
             _buildOption(Icons.email, 'Email', email),
-            _buildOption(Icons.lock, 'Password', '......'), // Fixed to display dots
+            _buildOption(Icons.lock, 'Password',
+                '•••••••••••••••'), // Fixed to display dots
             _buildOption(Icons.fitness_center, 'Weight', weight),
             _buildOption(Icons.straighten, 'Height', height),
             _buildOption(Icons.track_changes, 'Goal', goal),
@@ -331,7 +337,6 @@ class AccountCard extends StatelessWidget {
     );
   }
 }
-
 class AccountCard2 extends StatelessWidget {
   const AccountCard2({super.key});
 
@@ -354,15 +359,51 @@ class AccountCard2 extends StatelessWidget {
   }
 
   Widget _buildOption(BuildContext context, IconData icon, String title) {
+    void _logout(BuildContext context) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear(); // supprime tous les tokens/id
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
+
+    void _deleteAccount(BuildContext context) async {
+      final userId = UserSession.userIdN ?? UserSession.userIdF;
+      if (userId == null) {
+        print('User ID is null');
+        return;
+      }
+
+      try {
+       
+        final url = ApiConfig.deleteAdherent(userId);
+        final response = await http.delete(
+          url,
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        if (response.statusCode == 200) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.clear();
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) =>  Home()),
+          );
+        } else {
+          print('Failed to delete account: ${response.body}');
+        }
+      } catch (e) {
+        print('Error deleting account: $e');
+      }
+    }
+
     return ListTile(
       leading: Icon(icon, color: Colors.red, size: 30),
       title: Text(title, style: const TextStyle(color: Colors.red)),
       onTap: () {
-        // TODO: Implement logout and delete account functionality
         if (title == 'Logout') {
-          // Add logout logic
+          _logout(context);
         } else if (title == 'Delete account') {
-          // Add delete account logic
+          _deleteAccount(context);
         }
       },
     );

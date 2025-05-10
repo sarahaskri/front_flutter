@@ -21,6 +21,7 @@ import 'package:fityes/home.dart'; // Assurez-vous que Home est bien importé
 import 'package:fityes/sprint_2/admin_service.dart';
 import 'package:fityes/sprint_2/mealPlanner.dart';
 import 'package:fityes/sprint_3/workout_planner.dart';
+import 'package:fityes/sprint_4/progressionPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -112,7 +113,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:LoginPage(),
+      home:AdminDashboardPage(),
       navigatorKey: navigatorKey,
       routes: {
     

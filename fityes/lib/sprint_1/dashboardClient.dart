@@ -24,8 +24,6 @@ class _Dashboardclient extends State<Dashboardclient> {
   String? userId;
   int _selectedIndex = 0;
 
-
-
   Future<void> _loadUserId() async {
     await UserSession.loadUserId();
     setState(() {
@@ -39,8 +37,8 @@ class _Dashboardclient extends State<Dashboardclient> {
       print("Erreur: userId est null");
     }
   }
-  
-    List<String> _titles = [
+
+  List<String> _titles = [
     'Home',
     'Meals',
     'Workouts',
@@ -55,17 +53,17 @@ class _Dashboardclient extends State<Dashboardclient> {
     super.initState();
     print("Goal reçu : ${widget.goal}");
     _loadUserId();
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-      
-        body: Center(
-          child: Text('Dashboard Content Goes Here'),
-        ),
+    return Scaffold(
+       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        elevation: 0,
+      ),
+      body: Center(
+        child: Text('Dashboard Content Goes Here'),
       ),
     );
   }

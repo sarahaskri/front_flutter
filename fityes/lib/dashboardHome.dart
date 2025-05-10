@@ -78,75 +78,73 @@ class _DashboardHome extends State<DashboardHome> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            // Contenu principal
-            _screens[_selectedIndex],
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Contenu principal
+          _screens[_selectedIndex],
 
-            // Bulle circulaire déplaçable
-            Positioned(
-              left: posX,
-              top: posY,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  setState(() {
-                    posX += details.delta.dx;
-                    posY += details.delta.dy;
-                  });
-                },
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => GeminiChatbot()),
-                  );
-                },
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:  Color(0xFFD8B5FF),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.chat_rounded, color: Colors.white),
+          // Bulle circulaire déplaçable
+          Positioned(
+            left: posX,
+            top: posY,
+            child: GestureDetector(
+              onPanUpdate: (details) {
+                setState(() {
+                  posX += details.delta.dx;
+                  posY += details.delta.dy;
+                });
+              },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GeminiChatbot()),
+                );
+              },
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFD8B5FF),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6,
+                    ),
+                  ],
                 ),
+                child: const Icon(Icons.chat_rounded, color: Colors.white),
               ),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
             ),
           ],
         ),
-        bottomNavigationBar: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home, 0),
-              _buildNavItem(Icons.restaurant, 1),
-              _buildNavItem(Icons.fitness_center, 2),
-              _buildNavItem(Icons.show_chart, 3),
-              _buildNavItem(Icons.person, 4),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(Icons.home, 0),
+            _buildNavItem(Icons.restaurant, 1),
+            _buildNavItem(Icons.fitness_center, 2),
+            _buildNavItem(Icons.show_chart, 3),
+            _buildNavItem(Icons.person, 4),
+          ],
         ),
       ),
     );
@@ -167,7 +165,9 @@ class _DashboardHome extends State<DashboardHome> {
         ),
         child: Icon(
           icon,
-          color: isSelected ? Colors.white : const Color.fromARGB(255, 186, 186, 186),
+          color: isSelected
+              ? Colors.white
+              : const Color.fromARGB(255, 186, 186, 186),
           size: 30,
         ),
       ),

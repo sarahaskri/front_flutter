@@ -42,26 +42,18 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Meal Planner"),
+        titleTextStyle: TextStyle(
+            color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(Icons.arrow_back_ios),
-                  Text("Meal Planner",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Icon(Icons.more_vert),
-                ],
-              ),
-              const SizedBox(height: 30),
-
               // Meal Nutritions
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -249,7 +241,6 @@ Future<List<Map<String, dynamic>>> fetchTodayMeals(
     body: jsonEncode({
       "userId": userId,
       "mealType": mealType,
-      
     }),
   );
 
@@ -257,10 +248,11 @@ Future<List<Map<String, dynamic>>> fetchTodayMeals(
     final data = jsonDecode(response.body);
     return List<Map<String, dynamic>>.from(data['meals']);
   } else {
-    throw Exception('Échec de chargement des repas');
+    // Affiche seulement le contenu brut sans "Erreur" ou "Exception"
+    print(response.body);
+    return [];
   }
 }
-
 
 Widget buildTodayMeals(String mealType, String userId) {
   return FutureBuilder<List<Map<String, dynamic>>>(
@@ -269,9 +261,9 @@ Widget buildTodayMeals(String mealType, String userId) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(child: CircularProgressIndicator());
       } else if (snapshot.hasError) {
-        return Text('Erreur : ${snapshot.error}');
+        return Text('Error : ${snapshot.error}');
       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return Text("Aucun repas pour $mealType aujourd'hui");
+        return Text("No  $mealType meals found for today");
       } else {
         final meals = snapshot.data!;
         return Column(
@@ -282,8 +274,8 @@ Widget buildTodayMeals(String mealType, String userId) {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ...meals.map((meal) {
-              final name = meal['mealName'] ?? 'Nom inconnu';
-              final time = meal['time'] ?? 'Heure inconnue';
+              final name = meal['mealName'] ?? 'Name unknown';
+              final time = meal['time'] ?? 'Time unknown';
               final imagePath = meal['imagePath'];
 
               return ListTile(
@@ -296,7 +288,7 @@ Widget buildTodayMeals(String mealType, String userId) {
                       )
                     : const Icon(Icons.fastfood),
                 title: Text(name),
-                subtitle: Text("Heure: $time"),
+                subtitle: Text("Time: $time"),
               );
             }).toList(),
           ],
@@ -305,7 +297,6 @@ Widget buildTodayMeals(String mealType, String userId) {
     },
   );
 }
-
 
 class MealCategoryCard extends StatelessWidget {
   final String title;

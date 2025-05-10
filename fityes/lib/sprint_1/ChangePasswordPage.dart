@@ -5,11 +5,11 @@ import 'package:fityes/user_session.dart';
 import 'package:http/http.dart' as http;
 
 class ChangePasswordPage extends StatefulWidget {
-  final String password; // Ajout du paramètre password
+ // Ajout du paramètre password
 
   const ChangePasswordPage({
     super.key,
-    required this.password,
+   
   });
 
   @override
@@ -28,7 +28,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   void initState() {
     super.initState();
-    _oldPasswordController = TextEditingController(text: widget.password); // Initialisation avec le mot de passe reçu
+     _oldPasswordController = TextEditingController(); // Initialisation avec le mot de passe reçu
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _loadUserId();
@@ -51,16 +51,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   // Validation methods
-  String? _validateOldPassword(String? value) {
+String? _validateOldPassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Old password is required';
     }
-    if (value != widget.password) { // Comparaison avec le mot de passe reçu
-      return 'Old password is incorrect';
-    }
-    return null;
+    return null; // Retrait de la comparaison frontale
   }
-
   String? _validateNewPassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'New password is required';

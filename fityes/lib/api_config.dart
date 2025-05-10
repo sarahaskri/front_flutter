@@ -31,6 +31,6 @@ class ApiConfig {
   static Uri getAdherentById(String userId) => Uri.parse('${baseUrl}users/getAdherentById/$userId');
    static Uri update(String userId) => Uri.parse('${baseUrl}users/update/$userId');
     static Uri updatePassword(String userId) => Uri.parse('${baseUrl}users/updatePassword/$userId');
-  //  static Uri getGoal(String userId) => Uri.parse('${baseUrl}/goal/$userId');
+    static Uri deleteAdherent(String userId) => Uri.parse('${baseUrl}users/deleteAdherent/$userId');
 
 }
