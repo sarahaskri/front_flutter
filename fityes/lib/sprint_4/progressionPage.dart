@@ -21,7 +21,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
   double? weightDifference;
   double? progressPercentage;
   bool isLoading = false;
-  final TextEditingController _currentWeightController = TextEditingController();
+  final TextEditingController _currentWeightController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -59,8 +60,11 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
       if (response.statusCode == 200) {
         final goalData = json.decode(response.body);
         setState(() {
-          targetWeight = double.tryParse(goalData['targetWeight']?.toString() ?? '0') ?? 0;
-          initialWeight = double.tryParse(goalData['initialWeight']?.toString() ?? '0') ?? 0; // Fetch initial weight
+          targetWeight =
+              double.tryParse(goalData['targetWeight']?.toString() ?? '0') ?? 0;
+          initialWeight =
+              double.tryParse(goalData['initialWeight']?.toString() ?? '0') ??
+                  0; // Fetch initial weight
           goal = goalData['goal'] ?? 'unknown';
         });
       } else {
@@ -75,6 +79,33 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
     }
   }
 
+  Future<void> addProgression(
+      String userId,
+      double targetWeight,
+      double initialWeight,
+      double currentWeight,
+      double weightDifference) async {
+    final baseUrl = ApiConfig.addProgression();
+    // print('userId: $userId, goal: $goal');
+    final response = await http.post(
+      baseUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+        'targetWeight': targetWeight,
+        'initialWeight': initialWeight,
+        'currentWeight': currentWeight,
+        'weightDifference': weightDifference
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+    } else {
+      print('Erreur: ${response.body}');
+    }
+  }
+
   void _compareWeights() {
     if (_currentWeightController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,30 +113,50 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
       );
       return;
     }
-
+    double? tempCurrentWeight = double.tryParse(_currentWeightController.text);
+    if (tempCurrentWeight == null || tempCurrentWeight <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid positive weight')),
+      );
+      return;
+    }
     setState(() {
       currentWeight = double.tryParse(_currentWeightController.text) ?? 0;
 
-      if (currentWeight != null && targetWeight != null && initialWeight != null) {
+      if (currentWeight != null &&
+          targetWeight != null &&
+          initialWeight != null) {
         weightDifference = (currentWeight! - targetWeight!).abs();
+        addProgression(userId!, targetWeight!, initialWeight!, currentWeight!,
+            weightDifference!);
 
         // Progress calculation for different goals
         if (goal?.toLowerCase().contains('lose weight') == true) {
           if (initialWeight! <= targetWeight!) {
-            progressPercentage = 100.0; // If initial weight is already at or below target
+            progressPercentage =
+                100.0; // If initial weight is already at or below target
           } else {
-            double totalToLose = (initialWeight! - targetWeight!).clamp(0, double.infinity);
-            double lost = (initialWeight! - currentWeight!).clamp(0, totalToLose);
-            progressPercentage = totalToLose == 0 ? 100.0 : (lost / totalToLose * 100).clamp(0.0, 100.0);
+            double totalToLose =
+                (initialWeight! - targetWeight!).clamp(0, double.infinity);
+            double lost =
+                (initialWeight! - currentWeight!).clamp(0, totalToLose);
+            progressPercentage = totalToLose == 0
+                ? 100.0
+                : (lost / totalToLose * 100).clamp(0.0, 100.0);
           }
         } else if (goal?.toLowerCase().contains('gain weight') == true ||
-                   goal?.toLowerCase().contains('build muscle') == true) {
+            goal?.toLowerCase().contains('build muscle') == true) {
           if (initialWeight! >= targetWeight!) {
-            progressPercentage = 100.0; // If initial weight is already at or above target
+            progressPercentage =
+                100.0; // If initial weight is already at or above target
           } else {
-            double totalToGain = (targetWeight! - initialWeight!).clamp(0, double.infinity);
-            double gained = (currentWeight! - initialWeight!).clamp(0, totalToGain);
-            progressPercentage = totalToGain == 0 ? 100.0 : (gained / totalToGain * 100).clamp(0.0, 100.0);
+            double totalToGain =
+                (targetWeight! - initialWeight!).clamp(0, double.infinity);
+            double gained =
+                (currentWeight! - initialWeight!).clamp(0, totalToGain);
+            progressPercentage = totalToGain == 0
+                ? 100.0
+                : (gained / totalToGain * 100).clamp(0.0, 100.0);
           }
         } else {
           progressPercentage = 0.0; // Default for unknown goal
@@ -120,8 +171,9 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
   }
 
   String _getAdviceBasedOnGoal() {
-    if (goal == null || goal == 'unknown') return 'Please set a goal to receive advice.';
-    
+    if (goal == null || goal == 'unknown')
+      return 'Please set a goal to receive advice.';
+
     if (goal!.toLowerCase().contains('lose weight')) {
       return 'Focus on a calorie deficit diet, incorporate cardio exercises, and stay hydrated. Aim for 1-2 pounds of weight loss per week.';
     } else if (goal!.toLowerCase().contains('gain weight')) {
@@ -133,7 +185,10 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
   }
 
   String _getProgressMessage() {
-    if (goal == null || goal == 'unknown' || currentWeight == null || targetWeight == null) {
+    if (goal == null ||
+        goal == 'unknown' ||
+        currentWeight == null ||
+        targetWeight == null) {
       return 'Enter your current weight to see progress.';
     }
 
@@ -143,7 +198,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
           : currentWeight! < targetWeight!
               ? 'You are below your target! Consider adjusting your goal.'
               : 'Congratulations! You’ve reached your target weight!';
-    } else if (goal!.toLowerCase().contains('gain weight') || goal!.toLowerCase().contains('build muscle')) {
+    } else if (goal!.toLowerCase().contains('gain weight') ||
+        goal!.toLowerCase().contains('build muscle')) {
       return currentWeight! < targetWeight!
           ? 'You need to gain ${weightDifference!.toStringAsFixed(1)} kg to reach your target.'
           : currentWeight! > targetWeight!
@@ -178,7 +234,7 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,  
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -223,7 +279,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              prefixIcon: const Icon(Icons.fitness_center, color: Color(0xFF7EB6FF)),
+                              prefixIcon: const Icon(Icons.fitness_center,
+                                  color: Color(0xFF7EB6FF)),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -241,7 +298,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                               onPressed: _compareWeights,
                               child: const Text(
                                 'Compare',
-                                style: TextStyle(color: Colors.white, fontSize: 18),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
                               ),
                             ),
                           ),
@@ -274,25 +332,29 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                             const SizedBox(height: 16),
                             Text(
                               'Weight Difference: ${weightDifference!.toStringAsFixed(1)} kg',
-                              style: const TextStyle(fontSize: 16, color: Colors.grey),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.grey),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               'Progress Towards Goal: ${progressPercentage!.toStringAsFixed(1)}%',
-                              style: const TextStyle(fontSize: 16, color: Colors.grey),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.grey),
                             ),
                             const SizedBox(height: 10),
                             LinearProgressIndicator(
                               value: progressPercentage! / 100,
                               backgroundColor: Colors.grey[200],
-                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF7EB6FF)),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF7EB6FF)),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               _getProgressMessage(),
                               style: TextStyle(
                                 fontSize: 16,
-                                color: (currentWeight == targetWeight || progressPercentage == 100)
+                                color: (currentWeight == targetWeight ||
+                                        progressPercentage == 100)
                                     ? Colors.green
                                     : Colors.black87,
                               ),
@@ -325,12 +387,14 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                           const SizedBox(height: 16),
                           Text(
                             'Goal: ${goal ?? 'Loading...'}',
-                            style: const TextStyle(fontSize: 16, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
                           ),
                           const SizedBox(height: 10),
                           Text(
                             _getAdviceBasedOnGoal(),
-                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black87),
                           ),
                         ],
                       ),

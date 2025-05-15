@@ -1,6 +1,34 @@
+import 'package:fityes/api_config.dart';
 import 'package:fityes/dashboardHome.dart';
 import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; // Ajout de la dépendance HTTP
+import 'dart:convert'; // Pour jsonEncode
+
+
+// Méthode pour calculer l'objectif
+Future<void> calculateGoal(String userId, String goal) async {
+  final baseUrl = ApiConfig.calculate_goal();
+  print('userId: $userId, goal: $goal');
+  try {
+    final response = await http.post(
+      baseUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'userId': userId, 'goal': goal}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('IMC: ${data['imc']}');
+      print('Message: ${data['message']}');
+    } else {
+      print('Erreur: ${response.body}');
+      throw Exception('Échec de la requête : ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Exception lors de l\'appel API : $e');
+  }
+}
 
 class GoalPage extends StatelessWidget {
   final List<GoalItem> goals = [
@@ -27,6 +55,11 @@ class GoalPage extends StatelessWidget {
       value: "gain weight",
     ),
   ];
+
+  // Supposons que userId est passé ou récupéré (par exemple via un Provider ou un état global)
+  final String userId; // À définir selon votre implémentation (exemple : via un argument ou un state management)
+
+  GoalPage({required this.userId}); // Constructeur pour recevoir userId
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +96,7 @@ class GoalPage extends StatelessWidget {
                 final goal = goals[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: GoalCard(goal: goal),
+                  child: GoalCard(goal: goal, userId: userId), // Passer userId au GoalCard
                 );
               },
             ),
@@ -90,8 +123,9 @@ class GoalItem {
 
 class GoalCard extends StatelessWidget {
   final GoalItem goal;
+  final String userId; // Ajout de userId comme paramètre
 
-  const GoalCard({required this.goal});
+  const GoalCard({required this.goal, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -116,40 +150,38 @@ class GoalCard extends StatelessWidget {
         children: [
           Image.asset(goal.image, height: 300, width: 300),
           Text(goal.title,
-              style:
-                  const TextStyle(fontSize: 30, fontWeight: FontWeight.bold,
-                      color: Colors.white)),
-          Text(goal.description, textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              )),
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(goal.description,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, color: Colors.white)),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              try {
+                // Appeler calculateGoal avant la navigation
+                await calculateGoal(userId, goal.value);
+                print('Goal selected: ${goal.value}');
 
-            Navigator.push(
-                                context,
-              MaterialPageRoute(
-               builder: (context) => DashboardHome(goal: goal.value)));
-            
-              print('Goal selected: ${goal.value}');
+                // Naviguer vers DashboardHome après succès
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DashboardHome(goal: goal.value)),
+                );
+              } catch (e) {
+                print('Erreur lors du calcul du goal : $e');
+                // Optionnel : Afficher une alerte ou un message d'erreur à l'utilisateur
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erreur : $e')),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: Colors.blueAccent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40)),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 60,
-                vertical: 15,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
             ),
             child: const Text("Confirm",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                )),
-          
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

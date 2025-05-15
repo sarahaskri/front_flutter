@@ -10,6 +10,7 @@ import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:fityes/firebaseNot.dart';
 import 'package:fityes/firebase_options.dart';
 import 'package:fityes/principal_dash.dart';
+import 'package:fityes/sprint_1/editProfile.dart';
 import 'package:fityes/sprint_1/goal.dart';
 import 'package:fityes/sprint_1/profilepage.dart';
 import 'package:fityes/sprint_2/admin_dashboard_sprint2.dart';
@@ -113,7 +114,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:ProgressTrackingPage(),
+      home:LoginPage(),
       navigatorKey: navigatorKey,
       routes: {
     

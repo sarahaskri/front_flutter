@@ -9,6 +9,7 @@ import 'package:fityes/sprint_1/dashboardClient.dart';
 import 'package:fityes/sprint_2/Breakfast/breakfast_interface.dart';
 import 'package:fityes/sprint_2/mealPlanner.dart';
 import 'package:fityes/sprint_3/workout_planner.dart';
+import 'package:fityes/sprint_4/progressionPage.dart';
 import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -62,10 +63,10 @@ class _DashboardHome extends State<DashboardHome> {
     print("Goal reçu : ${widget.goal}");
     _loadUserId();
     _screens = [
-      Dashboardclient(goal: widget.goal),
+      DashboardClient(),
       MealPlannerPage(),
       WorkoutTrackerView(),
-      Home(),
+      ProgressTrackingPage(),
       DataProfile(),
     ];
   }

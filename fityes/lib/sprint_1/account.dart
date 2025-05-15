@@ -191,8 +191,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content:
-                                Text('Google login failed or refused.')),
+                            content: Text('Google login failed or refused.')),
                       );
                     }
                   }),
@@ -315,8 +314,10 @@ class AuthService {
         final lastName =
             nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
 
-        UserSession.userIdF = uid;
-        print("Locally saved UID : ${UserSession.userIdF}");
+        // Stocker temporairement l'UID Firebase pour l'envoi à l'API
+        UserSession.userIdF =
+            uid; // À garder pour l'API, mais sera remplacé après
+        print("Locally saved UID (temporaire) : ${UserSession.userIdF}");
 
         final baseUrl = ApiConfig.addGoogleUser();
         final response = await http.post(
@@ -333,10 +334,18 @@ class AuthService {
         print("response of API : ${response.body}");
 
         if (response.statusCode == 200 || response.statusCode == 201) {
+          // Extraire _id de la réponse JSON
+          final data = jsonDecode(response.body);
+          final userIdFromBackend =
+              data['user']['_id'] as String; // Récupérer _id
+          UserSession.userIdF =
+              userIdFromBackend; // Mettre à jour userIdF avec _id
+          print("Updated userIdF with _id : ${UserSession.userIdF}");
+          UserSession.setUserIdF(userIdFromBackend);
           return true;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(' The user already exists')),
+            const SnackBar(content: Text('The user already exists')),
           );
           return false;
         }
@@ -346,8 +355,7 @@ class AuthService {
     } catch (e) {
       print("Error Google Sign-In: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Error signing in with Google')),
+        const SnackBar(content: Text('Error signing in with Google')),
       );
       return false;
     }

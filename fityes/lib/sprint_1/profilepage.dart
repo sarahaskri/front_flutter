@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:fityes/home.dart';
 import 'package:fityes/sprint_1/goal.dart';
+import 'package:fityes/user_session.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:fityes/api_config.dart'; 
+import 'package:fityes/api_config.dart';
 
 class ProfilePage extends StatefulWidget {
   final String email; // L'email de l'utilisateur
   const ProfilePage({super.key, required this.email});
-  
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -24,9 +25,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> updateProfile(String email, String gender, int age,
       double weight, double height) async {
-
-        ///////////////////////***************////////////////////////////// */
-             final baseUrl=ApiConfig.addProfileInformation();
+    ///////////////////////***************////////////////////////////// */
+    final baseUrl = ApiConfig.addProfileInformation();
 
     final response = await http.put(
       baseUrl,
@@ -44,14 +44,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-print(response.body);
+      print(response.body);
 
       if (responseData['message'] == 'Informations mises à jour avec succès') {
+        String? userId;
+        userId = UserSession.userIdN ?? UserSession.userIdF;
+        print('userID dans la page de profile avant goal,$userId');
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) =>  GoalPage()),
+          MaterialPageRoute(builder: (context) => GoalPage(userId: userId!)),
         );
         print('Navigation vers Home.dart exécutée');
-
       } else {
         _showErrorDialog(responseData['message'] ??
             'Erreur lors de la mise à jour du profil');

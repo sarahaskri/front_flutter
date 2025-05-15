@@ -32,5 +32,8 @@ class ApiConfig {
    static Uri update(String userId) => Uri.parse('${baseUrl}users/update/$userId');
     static Uri updatePassword(String userId) => Uri.parse('${baseUrl}users/updatePassword/$userId');
     static Uri deleteAdherent(String userId) => Uri.parse('${baseUrl}users/deleteAdherent/$userId');
+   static Uri addProgression() => Uri.parse('${baseUrl}users/addProgression');
+    static Uri getGoal_tW_imc_ByUserId(String userId) => Uri.parse('${baseUrl}users/getGoal_tW_imc_ByUserId/$userId');
+
 
 }
