@@ -13,7 +13,6 @@ class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
-
 class _ProfilePageState extends State<ProfilePage> {
   // Contrôleurs pour récupérer les données des champs de texte
   final TextEditingController _ageController = TextEditingController();
@@ -23,9 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Variable pour stocker la valeur sélectionnée du genre
   String? _selectedGender;
 
-  Future<void> updateProfile(String email, String gender, int age,
-      double weight, double height) async {
-    ///////////////////////***************////////////////////////////// */
+  Future<void> updateProfile(String email, String gender, int age, double weight, double height) async {
     final baseUrl = ApiConfig.addProfileInformation();
 
     final response = await http.put(
@@ -47,21 +44,30 @@ class _ProfilePageState extends State<ProfilePage> {
       print(response.body);
 
       if (responseData['message'] == 'Informations mises à jour avec succès') {
-        String? userId;
-        userId = UserSession.userIdN ?? UserSession.userIdF;
-        print('userID dans la page de profile avant goal,$userId');
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => GoalPage(userId: userId!)),
-        );
-        print('Navigation vers Home.dart exécutée');
+        // Prioriser userIdF pour Google Sign-in
+        String? userId = UserSession.userIdF ?? UserSession.userIdN;
+        if (userId == null) {
+          // Si aucun userId n'est disponible, tenter de recharger
+          await UserSession.loadUserId();
+          userId = UserSession.userIdF ?? UserSession.userIdN;
+        }
+        if (userId != null) {
+          print('userID dans la page de profile avant goal, $userId');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => GoalPage(userId: userId!)),
+          );
+          print('Navigation vers GoalPage exécutée');
+        } else {
+          _showErrorDialog('Aucun userId trouvé. Veuillez vous reconnecter.');
+        }
       } else {
-        _showErrorDialog(responseData['message'] ??
-            'Erreur lors de la mise à jour du profil');
+        _showErrorDialog(responseData['message'] ?? 'Erreur lors de la mise à jour du profil');
       }
     } else {
       _showErrorDialog('Erreur de connexion au serveur.');
     }
   }
+
 
 // Fonction pour afficher une boîte de dialogue d'erreur
   void _showErrorDialog(String message) {

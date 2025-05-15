@@ -33,13 +33,18 @@ class _DashboardHome extends State<DashboardHome> {
     await UserSession.loadUserId();
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
-      print("userId dans dashboard client : $userId");
+      print("userId dans dashboard Home : $userId");
     });
-
+    if (userId == null) {
+          // Si aucun userId n'est disponible, tenter de recharger
+          await UserSession.loadUserId();
+          userId = UserSession.userIdF ?? UserSession.userIdN;
+        }
     String? userGoal;
     try {
       final goalResponse = await http.get(
         Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+        
       );
 
       if (goalResponse.statusCode == 200) {
@@ -193,3 +198,4 @@ class _DashboardHome extends State<DashboardHome> {
     }
   }
 }
+ 

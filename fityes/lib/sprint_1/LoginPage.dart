@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
           return; // Ajout d'un return pour éviter d'exécuter le code suivant
         } else if (user['role'] == 'adherent') {
           final userId = UserSession.userIdN;
-          print('userId IN  login : $userId');
+          print('userId IN  ADHERENT NORMAL login : $userId');
           String? userGoal;
           try {
             final goalResponse = await http.get(
@@ -302,18 +302,36 @@ class _LoginPageState extends State<LoginPage> {
                       if (success) {
                         final email = FirebaseAuth.instance.currentUser?.email;
                         if (email != null && mounted) {
+                          final userId = UserSession.userIdN;
+                          String? userGoal;
+                          try {
+                            final goalResponse = await http.get(
+                              Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+                            );
+
+                            if (goalResponse.statusCode == 200) {
+                              final goalData = json.decode(goalResponse.body);
+                              userGoal = goalData['goal'];
+                            } else {
+                              print('Goal does not exist');
+                              userGoal = "unknown";
+                            }
+                          } catch (e) {
+                            print('Error retrieving goal: $e');
+                            userGoal = "unknown";
+                          }
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    ProfilePage(email: email)),
+                                builder: (context) => DashboardHome(
+                                    goal: userGoal ??
+                                        'unknown')), // Replace 'defaultGoal' with the appropriate value or variable
                           );
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                              content:
-                                  Text('Google login failed or refused.')),
+                              content: Text('Google login failed or refused.')),
                         );
                       }
                     }),
@@ -369,6 +387,39 @@ class _LoginPageState extends State<LoginPage> {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Définir checkWorkoutAndNotify en dehors de loginWithGoogle
+  Future<void> checkWorkoutAndNotify() async {
+    await UserSession.loadUserId(); // Charger userId si nécessaire
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print("Firebase Token: $fcmToken");
+    final userId = UserSession.userIdN;
+
+    if (userId != null && fcmToken != null) {
+      try {
+        final response = await http.post(
+          ApiConfig
+              .sendNotification(), // Assurez-vous que l'endpoint est correct
+          body: json.encode({'userId': userId, 'fcmToken': fcmToken}),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        final data = json.decode(response.body);
+        if (response.statusCode == 200 &&
+            data['success'] == true &&
+            data['workoutsCount'] > 0) {
+          print('Notification sent: ${data['message']}');
+        } else {
+          print('No exercise: ${data['message']}');
+        }
+      } catch (e) {
+        print('Notification error: $e');
+        throw Exception('Failed to send notification: $e'); // Propager l'erreur
+      }
+    } else {
+      print('UserId or FCM token is null');
+    }
+  }
+
   Future<bool> loginWithGoogle(BuildContext context) async {
     try {
       await GoogleSignIn().signOut();
@@ -403,15 +454,49 @@ class AuthService {
         if (response.statusCode == 200 || response.statusCode == 201) {
           final responseData = jsonDecode(response.body);
 
-          if (responseData.containsKey("userId")) {
-            UserSession.userIdF = responseData["userId"];
-            print("User ID from DB: ${UserSession.userIdF}");
-            return true;
-          } 
+          if (responseData.containsKey('userId') ||
+              responseData.containsKey('_id')) {
+            // Utiliser _id si disponible, sinon userId
+            final userIdFromBackend = responseData['userId'] ??
+                responseData['user']['_id'] as String?;
+            if (userIdFromBackend != null) {
+              UserSession.userIdN = userIdFromBackend;
+              UserSession.setUserIdN(userIdFromBackend);
+              String? userGoal;
+              String userId = userIdFromBackend;
+              try {
+                final goalResponse = await http.get(
+                  Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+                );
+
+                if (goalResponse.statusCode == 200) {
+                  final goalData = json.decode(goalResponse.body);
+                  userGoal = goalData['goal'];
+                } else {
+                  print('c');
+                  userGoal = "unknown";
+                }
+              } catch (e) {
+                print('Error retrieving goal: $e');
+                userGoal = "unknown";
+              }
+              print("User ID from DB dans page login: ${UserSession.userIdN}");
+
+              await checkWorkoutAndNotify();
+              return true;
+            } else {
+              print('No userId or _id found in response');
+              return false;
+            }
+          } else {
+            print('Response does not contain userId or _id');
+            return false;
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('User does not exist. Please sign-up with Google first.'),
+              content: Text(
+                  'User does not exist. Please sign-up with Google first.'),
             ),
           );
           return false;

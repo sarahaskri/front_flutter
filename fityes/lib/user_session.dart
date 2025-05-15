@@ -16,6 +16,7 @@ class UserSession {
     userIdF = id;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userIdF', id);
+    print("ID firebase enregistré dans page user_session: $userIdN");
   }
 
   static Future<void> loadUserId() async {

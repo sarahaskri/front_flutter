@@ -290,6 +290,11 @@ class AuthService {
     try {
       await GoogleSignIn().signOut();
 
+      // Réinitialiser UserSession avant une nouvelle connexion
+      UserSession.userIdN = null;
+      await UserSession.setUserIdN(''); // Réinitialiser dans SharedPreferences
+      UserSession.userIdF = null;
+
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return false;
 
@@ -315,9 +320,8 @@ class AuthService {
             nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
 
         // Stocker temporairement l'UID Firebase pour l'envoi à l'API
-        UserSession.userIdF =
-            uid; // À garder pour l'API, mais sera remplacé après
-        print("Locally saved UID (temporaire) : ${UserSession.userIdF}");
+        UserSession.userIdN = uid;
+        print("Locally saved UID (temporaire) : ${UserSession.userIdN}");
 
         final baseUrl = ApiConfig.addGoogleUser();
         final response = await http.post(
@@ -336,13 +340,21 @@ class AuthService {
         if (response.statusCode == 200 || response.statusCode == 201) {
           // Extraire _id de la réponse JSON
           final data = jsonDecode(response.body);
-          final userIdFromBackend =
-              data['user']['_id'] as String; // Récupérer _id
-          UserSession.userIdF =
-              userIdFromBackend; // Mettre à jour userIdF avec _id
-          print("Updated userIdF with _id : ${UserSession.userIdF}");
-          UserSession.setUserIdF(userIdFromBackend);
+          final userIdFromBackend = data['user']['_id'] as String;
+          final email = data['user']['email'] as String;
+          UserSession.userIdN = userIdFromBackend;
+          UserSession.setUserIdN(
+              userIdFromBackend); // Mettre à jour SharedPreferences
+          print("Updated userIdF with _id : ${UserSession.userIdN}");
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('userEmail',email);
+          ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text('Successful registration !')),
+          );
           return true;
+
+          //////////////////////////////////////
+          ////////////////////
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('The user already exists')),
