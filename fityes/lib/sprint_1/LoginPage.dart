@@ -245,6 +245,27 @@ class _LoginPageState extends State<LoginPage> {
                       RequiredValidator(errorText: 'Password is required'),
                 ),
                 const SizedBox(height: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          // Naviguer vers la page de réinitialisation
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Home()),
+                          );
+                        },
+                        child: const Text(
+                          'Forgot your password ?',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
 
                 // Login Button
                 SizedBox(
@@ -306,7 +327,8 @@ class _LoginPageState extends State<LoginPage> {
                           String? userGoal;
                           try {
                             final goalResponse = await http.get(
-                              Uri.parse('${ApiConfig.baseUrl}users/getGoal/$userId'),
+                              Uri.parse(
+                                  '${ApiConfig.baseUrl}users/getGoal/$userId'),
                             );
 
                             if (goalResponse.statusCode == 200) {
@@ -335,9 +357,6 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       }
                     }),
-                    const SizedBox(width: 20),
-                    _buildSocialButton("assets/images/facebook.png",
-                        () => print("Facebook Login")),
                   ],
                 ),
                 const SizedBox(height: 30),

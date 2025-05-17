@@ -129,18 +129,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   isEmail: true),
               const SizedBox(height: 15),
               _buildPasswordField(),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Checkbox(value: false, onChanged: (bool? value) {}),
-                  const Expanded(
-                    child: Text(
-                      'By continuing, you accept our Privacy Policy and Terms of Use.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -195,10 +183,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       );
                     }
                   }),
-                  const SizedBox(width: 20),
-                  _buildSocialButton("assets/images/facebook.png", () {
-                    // Facebook login à ajouter si nécessaire
-                  }),
+            
                 ],
               ),
               const SizedBox(height: 20),

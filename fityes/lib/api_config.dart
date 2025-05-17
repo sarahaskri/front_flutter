@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String ip = '192.168.43.151';
+  static const String ip = '192.168.1.14';
   static const String port = '5003';
   static const String basePath = '/api/';
   static const String basePathNotification = '/apinot/';

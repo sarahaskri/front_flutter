@@ -62,7 +62,7 @@ String? _validateOldPassword(String? value) {
       return 'New password is required';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'Password must be at least 8 characters';
     }
     return null;
   }
