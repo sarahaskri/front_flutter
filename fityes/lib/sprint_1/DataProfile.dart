@@ -41,7 +41,7 @@ class _DataProfileState extends State<DataProfile> {
 
     await UserSession.loadUserId();
     setState(() {
-        userId = UserSession.userIdN ?? UserSession.userIdF;
+      userId = UserSession.userIdN ?? UserSession.userIdF;
       print("userId in DataProfile: $userId");
     });
 
@@ -160,7 +160,7 @@ class _DataProfileState extends State<DataProfile> {
                       children: [
                         const Expanded(
                           child: Text(
-                            'Want to edit your profile?',
+                            'Want to edit your profil ?',
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.grey,
@@ -171,8 +171,8 @@ class _DataProfileState extends State<DataProfile> {
                         IconButton(
                           icon: const Icon(Icons.edit,
                               color: Color(0xFF9fbef7), size: 30),
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                         final  result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EditProfile(
@@ -187,6 +187,10 @@ class _DataProfileState extends State<DataProfile> {
                                 ),
                               ),
                             );
+                            if (result == true) {
+                              // Les données ont été modifiées → tu relances le fetch
+                              fetchAdherentData();
+                            }
                           },
                         ),
                       ],
@@ -337,6 +341,7 @@ class AccountCard extends StatelessWidget {
     );
   }
 }
+
 class AccountCard2 extends StatelessWidget {
   const AccountCard2({super.key});
 
@@ -375,7 +380,6 @@ class AccountCard2 extends StatelessWidget {
       }
 
       try {
-       
         final url = ApiConfig.deleteAdherent(userId);
         final response = await http.delete(
           url,
@@ -386,7 +390,7 @@ class AccountCard2 extends StatelessWidget {
           final prefs = await SharedPreferences.getInstance();
           await prefs.clear();
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) =>  Home()),
+            MaterialPageRoute(builder: (context) => Home()),
           );
         } else {
           print('Failed to delete account: ${response.body}');

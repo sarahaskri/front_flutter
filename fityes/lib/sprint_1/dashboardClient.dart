@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:fityes/api_config.dart';
@@ -25,9 +24,16 @@ class _DashboardClientState extends State<DashboardClient> {
   double? carbs = 0; // À récupérer depuis la BD
   double? proteins = 0; // À récupérer depuis la BD
   double? height; // Ajout de la hauteur
-  double? weight; // Ajout du poids 
+  double? weight; // Ajout du poids
   bool isLoading = false;
   String? userId;
+  String getBmiMessage(double? bmi) {
+    if (bmi == null) return "Unknown";
+    if (bmi < 18.5) return "You are underweight";
+    if (bmi < 25) return "You have a normal weight";
+    if (bmi < 30) return "You are overweight";
+    return "You are obese";
+  }
 
   @override
   void initState() {
@@ -109,6 +115,7 @@ class _DashboardClientState extends State<DashboardClient> {
       print('Erreur lors de la récupération du nom : ${response.statusCode}');
     }
   }
+
   Future<void> fetchUserDetails(String userId) async {
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}users/getAdherentDetails/$userId'),
@@ -121,9 +128,11 @@ class _DashboardClientState extends State<DashboardClient> {
         weight = data['weight']?.toDouble() ?? 0;
       });
     } else {
-      print('Erreur lors de la récupération des détails : ${response.statusCode}');
+      print(
+          'Erreur lors de la récupération des détails : ${response.statusCode}');
     }
   }
+
   Future<void> getTodayNutrition() async {
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}users/getTodayNutrition/$userId'),
@@ -212,9 +221,10 @@ class _DashboardClientState extends State<DashboardClient> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "You have a normal weight",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          Text(
+                            getBmiMessage(bmi),
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.white),
                           ),
                           Container(
                             width: 80,
@@ -224,7 +234,7 @@ class _DashboardClientState extends State<DashboardClient> {
                               gradient: LinearGradient(
                                 colors: [
                                   Color.fromARGB(255, 250, 156, 183),
-                                  Color(0xFFD8B5FF)
+                                  Color(0xFFD8B5FF),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -234,9 +244,10 @@ class _DashboardClientState extends State<DashboardClient> {
                               child: Text(
                                 bmi?.toStringAsFixed(1) ?? "0.0",
                                 style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -307,19 +318,23 @@ class _DashboardClientState extends State<DashboardClient> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                if (userId != null && height != null && weight != null) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PageModifyGoal(
-                                              userId: userId!,
-                                              height: height!,
-                                              weight: weight!,
-                                              currentGoal: goal ?? "lose weight",
-                                            ),
-                                          ),
-                                        );
-                                };},
+                                  if (userId != null &&
+                                      height != null &&
+                                      weight != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PageModifyGoal(
+                                          userId: userId!,
+                                          height: height!,
+                                          weight: weight!,
+                                          currentGoal: goal ?? "lose weight",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  ;
+                                },
                                 borderRadius: BorderRadius.circular(10),
                                 child: const Center(
                                   child: Text(

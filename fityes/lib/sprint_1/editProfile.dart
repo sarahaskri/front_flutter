@@ -133,7 +133,7 @@ class _EditProfileState extends State<EditProfile> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
-        Navigator.pop(context); // Return to previous page
+        Navigator.pop(context,true); // Return to previous page
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update profile: ${response.body}')),
@@ -278,6 +278,7 @@ class _EditProfileState extends State<EditProfile> {
                         'Save Changes',
                         style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
+                    
                     ),
                   ),
                 ],

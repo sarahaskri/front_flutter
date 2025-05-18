@@ -32,7 +32,7 @@ class PageModifyGoal extends StatelessWidget {
       final toGain = newTargetWeight - weight;
       message = 'Pour un IMC normal (22), vous devez prendre environ ${toGain.toStringAsFixed(1)} kg.';
     } else if (newGoal == 'build muscle') {
-      newTargetWeight = null; // Pas de targetWeight pour cet objectif
+      newTargetWeight = weight * 1.1; // Pas de targetWeight pour cet objectif
       final imc = weight / (height * height);
       message = 'Votre IMC est ${imc.toStringAsFixed(1)}. Concentrez-vous sur un excédent calorique contrôlé et l\'entraînement.';
     }
