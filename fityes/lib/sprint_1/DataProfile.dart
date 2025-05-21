@@ -23,7 +23,8 @@ class _DataProfileState extends State<DataProfile> {
   String weight = '';
   String height = '';
   String age = '';
-  String goal = 'unknown'; // Initialized as a class field
+  String goal = 'unknown';
+  String sexe = '';
 
   bool isLoading = false;
   String? userId;
@@ -83,6 +84,7 @@ class _DataProfileState extends State<DataProfile> {
         weight = data['weight']?.toString() ?? '';
         height = data['height']?.toString() ?? '';
         age = data['age']?.toString() ?? '';
+        sexe = data['gender']?.toString() ?? '';
       });
     }
 
@@ -137,10 +139,13 @@ class _DataProfileState extends State<DataProfile> {
                   Center(
                     child: Column(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              AssetImage('assets/images/beauty.png'),
+                          backgroundImage: AssetImage(
+                            sexe == 'Female'
+                                ? 'assets/images/beauty.png'
+                                : 'assets/images/boy.png',
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -172,7 +177,7 @@ class _DataProfileState extends State<DataProfile> {
                           icon: const Icon(Icons.edit,
                               color: Color(0xFF9fbef7), size: 30),
                           onPressed: () async {
-                         final  result = await Navigator.push(
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EditProfile(
@@ -400,16 +405,42 @@ class AccountCard2 extends StatelessWidget {
       }
     }
 
-    return ListTile(
-      leading: Icon(icon, color: Colors.red, size: 30),
-      title: Text(title, style: const TextStyle(color: Colors.red)),
-      onTap: () {
-        if (title == 'Logout') {
-          _logout(context);
-        } else if (title == 'Delete account') {
-          _deleteAccount(context);
-        }
+   return ListTile(
+  leading: Icon(icon, color: Colors.red, size: 30),
+  title: Text(title, style: const TextStyle(color: Colors.red)),
+  onTap: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title == 'Logout' ? 'Confirm Logout' : 'Confirm Account Deletion'),
+          content: Text(
+            title == 'Logout'
+                ? 'Are you sure you want to log out?'
+                : 'Are you sure you want to delete your account? This action is irreversible.',
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Confirm', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop(); 
+                if (title == 'Logout') {
+                  _logout(context);
+                } else if (title == 'Delete account') {
+                  _deleteAccount(context);
+                }
+              },
+            ),
+          ],
+        );
       },
     );
+  },
+);
+
   }
 }

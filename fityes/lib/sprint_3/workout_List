@@ -54,7 +54,7 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
         });
       } else {
         setState(() {
-          errorMessage = 'Erreur serveur: ${response.statusCode}';
+          errorMessage = 'No workouts found';
           isLoading = false;
         });
       }

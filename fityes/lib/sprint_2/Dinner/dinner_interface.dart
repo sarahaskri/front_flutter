@@ -1,13 +1,13 @@
-
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:fityes/api_config.dart';
 import 'package:fityes/sprint_2/Dinner/categoryMeal_listDinner.dart';
 import 'package:fityes/sprint_2/Lunch/categoryMeal_listLunch.dart';
-import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation1%20copy%202.dart';
+import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation1 copy 2.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation2.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation3.dart';
+import 'package:fityes/sprint_2/addMeal.dart';
 import 'package:fityes/sprint_2/mealModelAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular.dart';
@@ -15,7 +15,6 @@ import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular2.dart';
 import 'package:fityes/user_session.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fityes/sprint_2/Dinner/categoryMeal_listDinner.dart';
 import 'package:fityes/sprint_2/Dinner/mealCategoryforDinner.dart';
 
 class DinnerInterface extends StatelessWidget {
@@ -23,9 +22,9 @@ class DinnerInterface extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 139, 144, 244), // Orange clair
+        primaryColor: const Color.fromARGB(255, 139, 144, 244),
         colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: const Color(0xFF4DB6AC)), // Turquoise
+            .copyWith(secondary: const Color(0xFF4DB6AC)),
         fontFamily: 'Roboto',
       ),
       home: DinnerPage(),
@@ -40,32 +39,67 @@ class DinnerPage extends StatefulWidget {
 
 class _DinnerPagePageState extends State<DinnerPage> {
   String? userId;
-  late Future<List<Meal>> _futureBreakfast;
+  late Future<List<Meal>> _futureDinner;
+  final TextEditingController _searchController = TextEditingController();
+  List<MealExampleForDinner> _filteredMeals = []; // Initialisé vide par défaut
 
   Future<List<Meal>> getMealsByType(String type) async {
     final uri = ApiConfig.getMealsByType(type);
-    final res = await http.get(uri, headers: {'Content-Type': 'application/json'});
+    final res =
+        await http.get(uri, headers: {'Content-Type': 'application/json'});
 
     if (res.statusCode != 200) {
       throw Exception('Erreur ${res.statusCode}');
     }
     final List<dynamic> data = json.decode(res.body);
-    
     return data.map((e) => Meal.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   void initState() {
     super.initState();
-    _futureBreakfast = getMealsByType('Dinner');
+    _futureDinner = getMealsByType('Dinner');
     _loadUserId();
+    _searchController
+        .addListener(_onSearchChanged); // Écouter les changements de recherche
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserId() async {
     await UserSession.loadUserId();
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
-      print("userId dans lunch interface : $userId");
+      print("userId dans dinner interface : $userId");
+    });
+  }
+
+  // Fonction pour obtenir tous les repas (toutes catégories confondues)
+  List<MealExampleForDinner> getAllMeals() {
+    List<MealExampleForDinner> allMeals = [];
+    dinnerCategoryMeals.forEach((category, meals) {
+      allMeals.addAll(meals);
+    });
+    return allMeals;
+  }
+
+  // Fonction appelée à chaque changement dans le champ de recherche
+  void _onSearchChanged() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredMeals = []; // Définir comme vide au lieu de getAllMeals()
+      } else {
+        _filteredMeals = getAllMeals().where((meal) {
+          return meal.name.toLowerCase().contains(query) ||
+              meal.category.toLowerCase().contains(query) ||
+              meal.description.toLowerCase().contains(query);
+        }).toList();
+      }
     });
   }
 
@@ -74,7 +108,6 @@ class _DinnerPagePageState extends State<DinnerPage> {
     String date = DateTime.now().toString().split(' ')[0];
     String time = TimeOfDay.now().format(context);
 
-    // Ici tu feras l’appel HTTP vers Node
     print("Ajouté: $mealName, $mealType, $date, $time, user: $userId");
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -103,14 +136,6 @@ class _DinnerPagePageState extends State<DinnerPage> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.black),
-            onPressed: () {
-              // Action pour le bouton à droite
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -124,10 +149,19 @@ class _DinnerPagePageState extends State<DinnerPage> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search ',
+                  hintText: 'Search',
                   hintStyle: TextStyle(color: Colors.grey[600]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.grey),
+                          onPressed: () {
+                            _searchController.clear();
+                          },
+                        )
+                      : null,
                   border: InputBorder.none,
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
@@ -143,23 +177,18 @@ class _DinnerPagePageState extends State<DinnerPage> {
               child: Row(
                 children: [
                   const MealCategoryCard(
-                    subtitle: "Soup",
-                    imagePath: "assets/images/soup.png",
-                  ),
+                      subtitle: "Soup", imagePath: "assets/images/soup.png"),
                   const SizedBox(width: 10),
                   const MealCategoryCardPink(
-                    subtitle: "Grilled",
-                    imagePath: "assets/images/grilled.png",
-                  ),
+                      subtitle: "Grilled",
+                      imagePath: "assets/images/grilled.png"),
                   const MealCategoryCard(
-                    subtitle: "Seafood",
-                    imagePath: "assets/images/seafood.png",
-                  ),
+                      subtitle: "Seafood",
+                      imagePath: "assets/images/seafood.png"),
                   const SizedBox(width: 10),
                   const MealCategoryCardPink(
-                    subtitle: "Rice Bowl",
-                    imagePath: "assets/images/ricebowl.png",
-                  ),
+                      subtitle: "Rice Bowl",
+                      imagePath: "assets/images/ricebowl.png"),
                 ]
                     .map((w) => Padding(
                         padding: const EdgeInsets.only(right: 10), child: w))
@@ -175,71 +204,99 @@ class _DinnerPagePageState extends State<DinnerPage> {
               child: Row(
                 children: [
                   Recomandcard1(
-                    title: "Quinoa Chicken Bowl",
-                    subtitle: "Medium | 370KCal",
-                    imagePath: "assets/images/quinoa_bowl.png",
-                  ),
+                      title: "Quinoa Chicken Bowl",
+                      subtitle: "Medium | 370KCal",
+                      imagePath: "assets/images/quinoa_bowl.png"),
                   SizedBox(width: 10),
                   RecomandcardPink2(
-                    title: "Avocado Egg Sandwich",
-                    subtitle: "Easy | 330KCal",
-                    imagePath: "assets/images/avocado_egg_sandwich.png",
-                  ),
+                      title: "Avocado Egg Sandwich",
+                      subtitle: "Easy | 330KCal",
+                      imagePath: "assets/images/avocado_egg_sandwich.png"),
                   SizedBox(width: 10),
                   Recomandcard3(
-                    title: "Grilled Veggie Wrap",
-                    subtitle: "Easy | 290KCal",
-                    imagePath: "assets/images/veggie_wrap.png",
-                  ),
-                  
+                      title: "Grilled Veggie Wrap",
+                      subtitle: "Easy | 290KCal",
+                      imagePath: "assets/images/veggie_wrap.png"),
                 ],
               ),
             ),
             const SizedBox(height: 30),
             _buildSectionTitle(context, 'Popular'),
-            //  _buildRecipeCard(context, 'Blueberry Pancake', 'Medium | 30mins | 230kCal', 'assets/images/pancake_berry.png'),
-            _buildRecipeCarforpopular_1(
-              context,
-              'Blueberry Pancake',
-              'Medium | 30mins | 230kCal',
-              'assets/images/pancake_berry.png',
-            ),
+            _buildRecipeCarforpopular_1(context, 'Blueberry Pancake',
+                'Medium | 30mins | 230kCal', 'assets/images/pancake_berry.png'),
             _buildRecipeCarforpopular_2(context, 'Basil omelette',
                 'Medium | 20mins | 120kCal', 'assets/images/omelette.png'),
-                    const SizedBox(height: 30),
-            _buildSectionTitle(context, 'All Breakfast'),
+            const SizedBox(height: 30),
+            _buildSectionTitle(
+                context, 'All Dinner'), // Renommé en "All Dinner"
 
-            FutureBuilder<List<Meal>>(
-              future: _futureBreakfast,
-              builder: (ctx, snap) {
-                if (snap.connectionState != ConnectionState.done) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snap.hasError) {
-                  return Text('Erreur : ${snap.error}');
-                }
-                final meals = snap.data!;
-                if (meals.isEmpty) {
-                  return Text('Aucun repas trouvé');
-                }
-                return Column(
-                  children: meals.map((m) => _buildDynamicRecipeTile(context, m)).toList(),
+            // Liste des repas filtrés
+            if (_filteredMeals.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: Text('No meals found')),
+              )
+            else
+              ..._filteredMeals.asMap().entries.map((entry) {
+                final index = entry.key;
+                final meal = entry.value;
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    leading: Image.asset(
+                      meal.imagePath,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image),
+                    ),
+                    title: Text(
+                      meal.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Category: ${meal.category}'),
+                        Text(meal.description),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Calories: ${meal.nutrition['Calories']} | ${meal.nutrition['Proteins']} Proteins',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add, color: Color(0xFF7EB6FF)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AddMealPage(
+                              mealType: "Dinner",
+                              mealName: meal.name,
+                              imagepath: meal.imagePath,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 );
-              },
-            ),
+              }).toList(),
           ],
         ),
       ),
     );
   }
 
-
   Widget _buildDynamicRecipeTile(BuildContext ctx, Meal meal) {
     Uint8List? bytes;
 
     if (meal.imagePath.isNotEmpty) {
       try {
-        bytes = base64Decode(meal.imagePath); // Corrected decoding
+        bytes = base64Decode(meal.imagePath);
       } catch (e) {
         print('Error decoding image: $e');
       }
@@ -254,7 +311,7 @@ class _DinnerPagePageState extends State<DinnerPage> {
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -268,14 +325,15 @@ class _DinnerPagePageState extends State<DinnerPage> {
                   width: 50,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.fastfood, size: 40, color: Colors.grey);
+                    return const Icon(Icons.fastfood,
+                        size: 40, color: Colors.grey);
                   },
                 ),
               )
-            : Icon(Icons.fastfood, size: 40, color: Colors.grey),
-        title: Text(meal.mealName, style: TextStyle(fontWeight: FontWeight.bold)),
+            : const Icon(Icons.fastfood, size: 40, color: Colors.grey),
+        title: Text(meal.mealName,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('${meal.time} · ${meal.date}'),
-
       ),
     );
   }
@@ -297,17 +355,16 @@ class _DinnerPagePageState extends State<DinnerPage> {
   Widget _buildRecipeCard(
       BuildContext context, String title, String details, String imagePath) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: Colors.grey.withOpacity(0.2),
             blurRadius: 10,
             spreadRadius: 2,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -338,11 +395,7 @@ class _DinnerPagePageState extends State<DinnerPage> {
   }
 
   Widget _buildRecipeCarforpopular_1(
-    BuildContext context,
-    String title,
-    String details,
-    String imagePath,
-  ) {
+      BuildContext context, String title, String details, String imagePath) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
@@ -350,7 +403,6 @@ class _DinnerPagePageState extends State<DinnerPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: Colors.grey.withOpacity(0.2),
             blurRadius: 10,
             spreadRadius: 2,
@@ -378,18 +430,12 @@ class _DinnerPagePageState extends State<DinnerPage> {
         trailing: const Icon(Icons.arrow_forward_ios,
             color: Color(0xFFCC58F1), size: 20),
         onTap: () {
-          // Navigation vers la page FoodInfoDetailsView
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => FoodInfoDetailsView1(
-                mObj: const {
-                  "name": "Lunch", // Type de repas
-                },
-                dObj: {
-                  "name": title,
-                  "b_image": imagePath,
-                },
+                mObj: const {"name": "Dinner"},
+                dObj: {"name": title, "b_image": imagePath},
               ),
             ),
           );
@@ -397,67 +443,56 @@ class _DinnerPagePageState extends State<DinnerPage> {
       ),
     );
   }
-}
 
-Widget _buildRecipeCarforpopular_2(
-  BuildContext context,
-  String title,
-  String details,
-  String imagePath,
-) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 15),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          // ignore: deprecated_member_use
-          color: Colors.grey.withOpacity(0.2),
-          blurRadius: 10,
-          spreadRadius: 2,
-          offset: const Offset(0, 5),
-        ),
-      ],
-    ),
-    child: ListTile(
-      leading: Image.asset(imagePath, height: 50, width: 50),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Colors.black,
-        ),
-      ),
-      subtitle: Text(
-        details,
-        style: TextStyle(
-          fontSize: 13,
-          color: Colors.grey[600],
-        ),
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios,
-          color: Color(0xFFCC58F1), size: 20),
-      onTap: () {
-        // Navigation vers la page FoodInfoDetailsView
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FoodInfoDetailsView2(
-              mObj: const {
-                "name": "Lunch", // Type de repas
-              },
-              dObj: {
-                "name": title,
-                "b_image": imagePath,
-              },
-            ),
+  Widget _buildRecipeCarforpopular_2(
+      BuildContext context, String title, String details, String imagePath) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 5),
           ),
-        );
-      },
-    ),
-  );
+        ],
+      ),
+      child: ListTile(
+        leading: Image.asset(imagePath, height: 50, width: 50),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          details,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[600],
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios,
+            color: Color(0xFFCC58F1), size: 20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FoodInfoDetailsView2(
+                mObj: const {"name": "Dinner"},
+                dObj: {"name": title, "b_image": imagePath},
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class MealCategoryCard extends StatelessWidget {

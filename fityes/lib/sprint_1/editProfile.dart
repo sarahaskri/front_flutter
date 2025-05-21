@@ -9,7 +9,7 @@ class EditProfile extends StatefulWidget {
   final String firstname;
   final String lastname;
   final String email;
-  final String password; // Ajout du paramètre password
+  final String password;
   final String weight;
   final String height;
   final String age;
@@ -38,7 +38,9 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController _weightController;
   late TextEditingController _heightController;
   late TextEditingController _ageController;
-  late TextEditingController _goalController;
+
+  // Variable pour stocker la valeur sélectionnée de goal
+  String? _selectedGoal;
 
   bool isLoading = false;
   String? userId;
@@ -52,7 +54,8 @@ class _EditProfileState extends State<EditProfile> {
     _weightController = TextEditingController(text: widget.weight);
     _heightController = TextEditingController(text: widget.height);
     _ageController = TextEditingController(text: widget.age);
-    _goalController = TextEditingController(text: widget.goal);
+    // Initialiser la valeur de goal avec celle passée dans le widget
+    _selectedGoal = widget.goal.isNotEmpty ? widget.goal : null;
     _loadUserId();
   }
 
@@ -72,7 +75,6 @@ class _EditProfileState extends State<EditProfile> {
     _weightController.dispose();
     _heightController.dispose();
     _ageController.dispose();
-    _goalController.dispose();
     super.dispose();
   }
 
@@ -81,7 +83,7 @@ class _EditProfileState extends State<EditProfile> {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
       return 'Please enter a valid email (e.g., example@domain.com)';
     }
@@ -96,14 +98,26 @@ class _EditProfileState extends State<EditProfile> {
     return null;
   }
 
+  // Validation pour le goal
+  String? _validateGoal(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Goal is required';
+    }
+    if (!['lose weight', 'gain weight', 'build muscle'].contains(value)) {
+      return 'Please select a valid goal';
+    }
+    return null;
+  }
+
   Future<void> _updateProfile() async {
+    // Validation des champs
     if (_validateEmail(_emailController.text) != null ||
         _validateField(_firstnameController.text, 'First Name') != null ||
         _validateField(_lastnameController.text, 'Last Name') != null ||
         _validateField(_ageController.text, 'Age') != null ||
-        _validateField(_goalController.text, 'Goal') != null ||
         _validateField(_weightController.text, 'Weight') != null ||
-        _validateField(_heightController.text, 'Height') != null) {
+        _validateField(_heightController.text, 'Height') != null ||
+        _validateGoal(_selectedGoal) != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fix the errors in the form')),
       );
@@ -125,7 +139,7 @@ class _EditProfileState extends State<EditProfile> {
           'weight': _weightController.text,
           'height': _heightController.text,
           'age': _ageController.text,
-          'goal': _goalController.text,
+          'goal': _selectedGoal, // Utiliser la valeur sélectionnée
         }),
       );
 
@@ -133,7 +147,11 @@ class _EditProfileState extends State<EditProfile> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
-        Navigator.pop(context,true); // Return to previous page
+        Navigator.pop(context, true);
+      } else if (response.statusCode == 409) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('This email is already used')),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update profile: ${response.body}')),
@@ -212,7 +230,8 @@ class _EditProfileState extends State<EditProfile> {
                             const SizedBox(height: 16),
                             _buildTextField(Icons.person, 'First Name', _firstnameController),
                             _buildTextField(Icons.person, 'Last Name', _lastnameController),
-                            _buildTextField(Icons.email, 'Email', _emailController, validator: _validateEmail),
+                            _buildTextField(Icons.email, 'Email', _emailController,
+                                validator: _validateEmail),
                             ListTile(
                               leading: const Icon(Icons.lock, color: Color(0xFF9fbef7), size: 30),
                               title: const Text('Password'),
@@ -221,13 +240,46 @@ class _EditProfileState extends State<EditProfile> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ChangePasswordPage(
-                                                ),
+                                    builder: (context) => const ChangePasswordPage(),
                                   ),
                                 );
                               },
                             ),
-                            _buildTextField(Icons.track_changes, 'Goal', _goalController),
+                            // Remplacer TextFormField par DropdownButtonFormField pour goal
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: DropdownButtonFormField<String>(
+                                value: _selectedGoal,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.track_changes,
+                                      color: Color(0xFF9fbef7), size: 30),
+                                  labelText: 'Goal',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'lose weight',
+                                    child: Text('Lose Weight'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'gain weight',
+                                    child: Text('Gain Weight'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'build muscle',
+                                    child: Text('Build Muscle'),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedGoal = value;
+                                  });
+                                },
+                                validator: _validateGoal,
+                              ),
+                            ),
                             _buildTextField(Icons.calendar_month, 'Age', _ageController),
                           ],
                         ),
@@ -278,7 +330,6 @@ class _EditProfileState extends State<EditProfile> {
                         'Save Changes',
                         style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
-                    
                     ),
                   ),
                 ],
@@ -287,7 +338,9 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Widget _buildTextField(IconData icon, String label, TextEditingController controller, {String? Function(String?)? validator}) {
+  Widget _buildTextField(
+      IconData icon, String label, TextEditingController controller,
+      {String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(

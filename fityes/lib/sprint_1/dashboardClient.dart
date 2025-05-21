@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fityes/NotificationPage.dart';
 import 'package:fityes/api_config.dart';
 import 'package:fityes/sprint_1/PageModifyGoal.dart';
 import 'package:fityes/user_session.dart';
@@ -184,7 +185,17 @@ class _DashboardClientState extends State<DashboardClient> {
                     color: Colors.black87,
                   ),
                 ),
-                const Icon(Icons.notifications, color: Colors.red),
+                IconButton(
+                  icon: Icon(Icons.notifications, color: Colors.red),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              NotificationPage()),
+                    );
+                  },
+                )
               ],
             ),
 

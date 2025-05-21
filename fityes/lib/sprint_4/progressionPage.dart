@@ -15,39 +15,35 @@ class ProgressTrackingPage extends StatefulWidget {
 class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
   String? userId;
   double? targetWeight;
-  double? initialWeight; // Added to store the starting weight
+  double? initialWeight;
   String? goal;
   double? currentWeight;
   double? weightDifference;
   double? progressPercentage;
   bool isLoading = false;
-  final TextEditingController _currentWeightController =
-      TextEditingController();
+  List<String> _adviceList = [];
+
+  final TextEditingController _currentWeightController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadUserIdAndFetchGoal();
+    _loadUserData();
   }
 
-  Future<void> _loadUserIdAndFetchGoal() async {
-    setState(() {
-      isLoading = true;
-    });
+  Future<void> _loadUserData() async {
+    setState(() => isLoading = true);
 
     await UserSession.loadUserId();
-    setState(() {
-      userId = UserSession.userIdN ?? UserSession.userIdF;
-      print("userId in ProgressTrackingPage: $userId");
-    });
+    userId = UserSession.userIdN ?? UserSession.userIdF;
+    print("userId in ProgressTrackingPage: $userId");
 
     if (userId != null) {
       await _fetchGoalData();
+      await _fetchAndDisplayAdvice();
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
   }
 
   Future<void> _fetchGoalData() async {
@@ -60,11 +56,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
       if (response.statusCode == 200) {
         final goalData = json.decode(response.body);
         setState(() {
-          targetWeight =
-              double.tryParse(goalData['targetWeight']?.toString() ?? '0') ?? 0;
-          initialWeight =
-              double.tryParse(goalData['initialWeight']?.toString() ?? '0') ??
-                  0; // Fetch initial weight
+          targetWeight = double.tryParse(goalData['targetWeight']?.toString() ?? '0') ?? 0;
+          initialWeight = double.tryParse(goalData['initialWeight']?.toString() ?? '0') ?? 0;
           goal = goalData['goal'] ?? 'unknown';
         });
       } else {
@@ -79,30 +72,37 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
     }
   }
 
+  Future<void> _fetchAndDisplayAdvice() async {
+    if (goal == null) return;
+
+    List<String> advice = await _getAdviceBasedOnGoal(goal!);
+    setState(() {
+      _adviceList = advice;
+    });
+  }
+
   Future<void> addProgression(
-      String userId,
-      double targetWeight,
-      double initialWeight,
-      double currentWeight,
-      double weightDifference) async {
-    final baseUrl = ApiConfig.addProgression();
-    // print('userId: $userId, goal: $goal');
+    String userId,
+    double targetWeight,
+    double initialWeight,
+    double currentWeight,
+    double weightDifference,
+  ) async {
+    final url = ApiConfig.addProgression();
     final response = await http.post(
-      baseUrl,
+      url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'userId': userId,
         'targetWeight': targetWeight,
         'initialWeight': initialWeight,
         'currentWeight': currentWeight,
-        'weightDifference': weightDifference
+        'weightDifference': weightDifference,
       }),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-    } else {
-      print('Erreur: ${response.body}');
+    if (response.statusCode != 200) {
+      print('Erreur lors de l\'ajout de la progression: ${response.body}');
     }
   }
 
@@ -113,6 +113,7 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
       );
       return;
     }
+
     double? tempCurrentWeight = double.tryParse(_currentWeightController.text);
     if (tempCurrentWeight == null || tempCurrentWeight <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,26 +121,22 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
       );
       return;
     }
+
     setState(() {
-      currentWeight = double.tryParse(_currentWeightController.text) ?? 0;
+      currentWeight = tempCurrentWeight;
 
-      if (currentWeight != null &&
-          targetWeight != null &&
-          initialWeight != null) {
+      if (currentWeight != null && targetWeight != null && initialWeight != null) {
         weightDifference = (currentWeight! - targetWeight!).abs();
-        addProgression(userId!, targetWeight!, initialWeight!, currentWeight!,
-            weightDifference!);
 
-        // Progress calculation for different goals
+        addProgression(userId!, targetWeight!, initialWeight!, currentWeight!, weightDifference!);
+
+        // Calcul du progrès selon l'objectif
         if (goal?.toLowerCase().contains('lose weight') == true) {
           if (initialWeight! <= targetWeight!) {
-            progressPercentage =
-                100.0; // If initial weight is already at or below target
+            progressPercentage = 100.0;
           } else {
-            double totalToLose =
-                (initialWeight! - targetWeight!).clamp(0, double.infinity);
-            double lost =
-                (initialWeight! - currentWeight!).clamp(0, totalToLose);
+            double totalToLose = (initialWeight! - targetWeight!).clamp(0, double.infinity);
+            double lost = (initialWeight! - currentWeight!).clamp(0, totalToLose);
             progressPercentage = totalToLose == 0
                 ? 100.0
                 : (lost / totalToLose * 100).clamp(0.0, 100.0);
@@ -147,22 +144,18 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
         } else if (goal?.toLowerCase().contains('gain weight') == true ||
             goal?.toLowerCase().contains('build muscle') == true) {
           if (initialWeight! >= targetWeight!) {
-            progressPercentage =
-                100.0; // If initial weight is already at or above target
+            progressPercentage = 100.0;
           } else {
-            double totalToGain =
-                (targetWeight! - initialWeight!).clamp(0, double.infinity);
-            double gained =
-                (currentWeight! - initialWeight!).clamp(0, totalToGain);
+            double totalToGain = (targetWeight! - initialWeight!).clamp(0, double.infinity);
+            double gained = (currentWeight! - initialWeight!).clamp(0, totalToGain);
             progressPercentage = totalToGain == 0
                 ? 100.0
                 : (gained / totalToGain * 100).clamp(0.0, 100.0);
           }
         } else {
-          progressPercentage = 0.0; // Default for unknown goal
+          progressPercentage = 0.0;
         }
 
-        // Handle exact match with target
         if (currentWeight == targetWeight) {
           progressPercentage = 100.0;
         }
@@ -170,25 +163,42 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
     });
   }
 
-  String _getAdviceBasedOnGoal() {
-    if (goal == null || goal == 'unknown')
-      return 'Please set a goal to receive advice.';
+  Future<List<String>> _getAdviceBasedOnGoal(String goal) async {
+    try {
+      print('le goal est ,$goal');
+      final response = await http.post(
+        ApiConfig.getAdvice(),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'goal': goal}),
+      );
 
-    if (goal!.toLowerCase().contains('lose weight')) {
-      return 'Focus on a calorie deficit diet, incorporate cardio exercises, and stay hydrated. Aim for 1-2 pounds of weight loss per week.';
-    } else if (goal!.toLowerCase().contains('gain weight')) {
-      return 'Increase your protein intake, focus on strength training, and eat calorie-dense foods like nuts and avocados.';
-    } else if (goal!.toLowerCase().contains('build muscle')) {
-      return 'Balance your calorie intake with expenditure, maintain a consistent workout routine, and monitor your progress weekly.';
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['advice'] != null) {
+          // Filtrer les éléments null ou non-chaînes
+          final adviceList = (data['advice'] as List<dynamic>)
+              .where((item) => item != null && item is String && item.trim().isNotEmpty)
+              .cast<String>()
+              .toList();
+          return adviceList.isNotEmpty
+              ? adviceList
+              : ['Aucun conseil disponible.'];
+        } else {
+          print('Champ "advice" manquant dans la réponse');
+          return ['Aucun conseil disponible.'];
+        }
+      } else {
+        print('Erreur lors de la récupération des conseils: ${response.body}');
+        return ['Aucun conseil disponible.'];
+      }
+    } catch (e) {
+      print('Erreur réseau: $e');
+      return ['Erreur réseau.'];
     }
-    return 'Set a specific goal to receive tailored advice.';
   }
 
   String _getProgressMessage() {
-    if (goal == null ||
-        goal == 'unknown' ||
-        currentWeight == null ||
-        targetWeight == null) {
+    if (goal == null || goal == 'unknown' || currentWeight == null || targetWeight == null) {
       return 'Enter your current weight to see progress.';
     }
 
@@ -243,32 +253,22 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Weight Comparison Section
+                  // Section comparaison de poids
                   Card(
                     elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Weight Comparison',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
+                          const Text('Weight Comparison',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
                           const SizedBox(height: 16),
                           Text(
                             'Target Weight: ${targetWeight?.toStringAsFixed(1) ?? 'Loading...'} kg',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
+                            style: const TextStyle(fontSize: 16, color: Colors.grey),
                           ),
                           const SizedBox(height: 10),
                           TextField(
@@ -276,11 +276,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               labelText: 'Current Weight (kg)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              prefixIcon: const Icon(Icons.fitness_center,
-                                  color: Color(0xFF7EB6FF)),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              prefixIcon: const Icon(Icons.fitness_center, color: Color(0xFF7EB6FF)),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -296,11 +293,8 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                             ),
                             child: TextButton(
                               onPressed: _compareWeights,
-                              child: const Text(
-                                'Compare',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                              ),
+                              child: const Text('Compare',
+                                  style: TextStyle(color: Colors.white, fontSize: 18)),
                             ),
                           ),
                         ],
@@ -309,37 +303,29 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Statistics Section
                   if (weightDifference != null && progressPercentage != null)
                     Card(
                       elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Progress Statistics',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
+                            const Text('Progress Statistics',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87)),
                             const SizedBox(height: 16),
                             Text(
                               'Weight Difference: ${weightDifference!.toStringAsFixed(1)} kg',
-                              style: const TextStyle(
-                                  fontSize: 16, color: Colors.grey),
+                              style: const TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               'Progress Towards Goal: ${progressPercentage!.toStringAsFixed(1)}%',
-                              style: const TextStyle(
-                                  fontSize: 16, color: Colors.grey),
+                              style: const TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                             const SizedBox(height: 10),
                             LinearProgressIndicator(
@@ -363,43 +349,80 @@ class _ProgressTrackingPageState extends State<ProgressTrackingPage> {
                         ),
                       ),
                     ),
+
                   const SizedBox(height: 20),
 
-                  // Advice Section
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Personalized Advice',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                  if (_adviceList.isNotEmpty)
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      color: Colors.white,
+                      shadowColor: Colors.grey.withOpacity(0.2),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.lightbulb_outline,
+                                  color: Color(0xFF7EB6FF),
+                                  size: 24,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Advice Based on Your Goal',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Goal: ${goal ?? 'Loading...'}',
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.grey),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            _getAdviceBasedOnGoal(),
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black87),
-                          ),
-                        ],
+                            const SizedBox(height: 12),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _adviceList.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 6),
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF7EB6FF),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          _adviceList[index],
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

@@ -34,6 +34,8 @@ class ApiConfig {
     static Uri deleteAdherent(String userId) => Uri.parse('${baseUrl}users/deleteAdherent/$userId');
    static Uri addProgression() => Uri.parse('${baseUrl}users/addProgression');
     static Uri getGoal_tW_imc_ByUserId(String userId) => Uri.parse('${baseUrl}users/getGoal_tW_imc_ByUserId/$userId');
+    static Uri getAdvice() => Uri.parse('${baseUrl}users/getAdvice');
+    
 
 
 }

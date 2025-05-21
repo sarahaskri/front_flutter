@@ -69,21 +69,7 @@ class _FoodInfoDetailsViewState2 extends State<FoodInfoDetailsView2> {
                   child: Image.asset("assets/images/black_btn.png", width: 15, height: 15),
                 ),
               ),
-              actions: [
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    height: 40,
-                    width: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: TColor.lightGray,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset("assets/images/more_btn.png", width: 15, height: 15),
-                  ),
-                )
-              ],
+          
             ),
             SliverAppBar(
               backgroundColor: Colors.transparent,

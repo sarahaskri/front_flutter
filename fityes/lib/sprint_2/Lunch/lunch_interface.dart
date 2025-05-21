@@ -7,6 +7,7 @@ import 'package:fityes/sprint_2/Lunch/categoryMeal_listLunch.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation1%20copy%202.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation2.dart';
 import 'package:fityes/sprint_2/Lunch/food_info_detail_recommandation3.dart';
+import 'package:fityes/sprint_2/addMeal.dart';
 import 'package:fityes/sprint_2/mealModelAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular.dart';
@@ -14,7 +15,7 @@ import 'package:fityes/sprint_2/Breakfast/food_info_detail_popular2.dart';
 import 'package:fityes/user_session.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:fityes/sprint_2/Lunch/mealCategoryforLunch.dart';
 
 class LunchInterface extends StatelessWidget {
   @override
@@ -39,6 +40,8 @@ class LunchPage extends StatefulWidget {
 class _LunchPagePageState extends State<LunchPage> {
   String? userId;
   late Future<List<Meal>> _futureBreakfast;
+  final TextEditingController _searchController = TextEditingController(); // Ajout du contrôleur
+  List<MealExampleForLunch> _filteredMeals = []; // Initialisé vide comme dans dinner_interface
 
   Future<List<Meal>> getMealsByType(String type) async {
     final uri = ApiConfig.getMealsByType(type);
@@ -48,7 +51,6 @@ class _LunchPagePageState extends State<LunchPage> {
       throw Exception('Erreur ${res.statusCode}');
     }
     final List<dynamic> data = json.decode(res.body);
-    
     return data.map((e) => Meal.fromJson(e as Map<String, dynamic>)).toList();
   }
 
@@ -57,6 +59,13 @@ class _LunchPagePageState extends State<LunchPage> {
     super.initState();
     _futureBreakfast = getMealsByType('Lunch');
     _loadUserId();
+    _searchController.addListener(_onSearchChanged); // Écoute les changements
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose(); // Libère le contrôleur
+    super.dispose();
   }
 
   Future<void> _loadUserId() async {
@@ -64,6 +73,31 @@ class _LunchPagePageState extends State<LunchPage> {
     setState(() {
       userId = UserSession.userIdN ?? UserSession.userIdF;
       print("userId dans lunch interface : $userId");
+    });
+  }
+
+  // Fonction pour obtenir tous les repas (toutes catégories confondues)
+  List<MealExampleForLunch> getAllMeals() {
+    List<MealExampleForLunch> allMeals = [];
+    lunchcategoryMeals.forEach((category, meals) {
+      allMeals.addAll(meals);
+    });
+    return allMeals;
+  }
+
+  // Fonction appelée à chaque changement dans la barre de recherche
+  void _onSearchChanged() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredMeals = []; // Vide la liste quand la recherche est vide
+      } else {
+        _filteredMeals = getAllMeals().where((meal) {
+          return meal.name.toLowerCase().contains(query) ||
+              meal.category.toLowerCase().contains(query) ||
+              meal.description.toLowerCase().contains(query);
+        }).toList();
+      }
     });
   }
 
@@ -101,31 +135,32 @@ class _LunchPagePageState extends State<LunchPage> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.black),
-            onPressed: () {
-              // Action pour le bouton à droite
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Barre de recherche
+            // Barre de recherche avec ajout de suffixIcon pour effacer
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(30),
               ),
               child: TextField(
+                controller: _searchController, // Associe le contrôleur
                 decoration: InputDecoration(
-                  hintText: 'Search ',
+                  hintText: 'Search',
                   hintStyle: TextStyle(color: Colors.grey[600]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.grey),
+                          onPressed: () {
+                            _searchController.clear();
+                          },
+                        )
+                      : null,
                   border: InputBorder.none,
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
@@ -194,7 +229,6 @@ class _LunchPagePageState extends State<LunchPage> {
             ),
             const SizedBox(height: 30),
             _buildSectionTitle(context, 'Popular'),
-            //  _buildRecipeCard(context, 'Blueberry Pancake', 'Medium | 30mins | 230kCal', 'assets/images/pancake_berry.png'),
             _buildRecipeCarforpopular_1(
               context,
               'Blueberry Pancake',
@@ -206,32 +240,70 @@ class _LunchPagePageState extends State<LunchPage> {
                 'Basil omelette',
                 'Medium | 20mins | 120kCal',
                 'assets/images/omelette.png'),
-                            const SizedBox(height: 30),
-            _buildSectionTitle(context, 'All Breakfast'),
+            const SizedBox(height: 30),
+            _buildSectionTitle(context, 'All Lunch'), // Corrigé de "All Breakfast" à "All Lunch"
 
-            FutureBuilder<List<Meal>>(
-              future: _futureBreakfast,
-              builder: (ctx, snap) {
-                if (snap.connectionState != ConnectionState.done) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snap.hasError) {
-                  return Text('Erreur : ${snap.error}');
-                }
-                final meals = snap.data!;
-                if (meals.isEmpty) {
-                  return Text('Aucun repas trouvé');
-                }
-                return Column(
-                  children: meals.map((m) => _buildDynamicRecipeTile(context, m)).toList(),
+            // Liste des repas filtrés
+            if (_filteredMeals.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: Text('No meals found')),
+              )
+            else
+              ..._filteredMeals.asMap().entries.map((entry) {
+                final index = entry.key;
+                final meal = entry.value;
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    leading: Image.asset(
+                      meal.imagePath,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image),
+                    ),
+                    title: Text(
+                      meal.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Category: ${meal.category}'),
+                        Text(meal.description),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Calories: ${meal.nutrition['Calories']} | ${meal.nutrition['Proteins']} Proteins',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add, color: Color(0xFF7EB6FF)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AddMealPage(
+                              mealType: "Lunch",
+                              mealName: meal.name,
+                              imagepath: meal.imagePath,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 );
-              },
-            ),
+              }).toList(),
           ],
         ),
       ),
     );
   }
+
   Widget _buildDynamicRecipeTile(BuildContext ctx, Meal meal) {
     Uint8List? bytes;
 
@@ -273,7 +345,6 @@ class _LunchPagePageState extends State<LunchPage> {
             : Icon(Icons.fastfood, size: 40, color: Colors.grey),
         title: Text(meal.mealName, style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('${meal.time} · ${meal.date}'),
-
       ),
     );
   }
@@ -291,6 +362,7 @@ class _LunchPagePageState extends State<LunchPage> {
       ),
     );
   }
+
   Widget _buildRecipeCard(
       BuildContext context, String title, String details, String imagePath) {
     return Container(

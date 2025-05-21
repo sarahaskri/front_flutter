@@ -65,16 +65,7 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
                           height: media.width * 0.8,
                           fit: BoxFit.cover,
                         ),
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.play_arrow,
-                              size: 40, color: Colors.black),
-                        ),
+                    
                         Positioned(
                           top: 20,
                           left: 10,
